@@ -7,7 +7,7 @@ Drag PDF is Multi-platform software to combine and generate PDF documents develo
 
 ## Start using DragPDF 
 To start using DragPDF in your own project, the first thing you should do is:
-* Download the DragPDF.jar file available in the root directory of this repository.
+* Download the DragPDF app file available in the [Executables directory](https://github.com/vicajilau/Drag-PDF/tree/master/Executables) of this repository.
 
 ### License
 
