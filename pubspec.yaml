@@ -53,7 +53,7 @@ dependencies:
   pdfx: ^2.8.0
   platform_detail: ^4.2.0
   share_plus: ^10.1.4
-  signature: ^5.5.0
+  signature: ^6.0.0
 
 flutter_icons:
   image_path_android: "assets/icons/android-icon.png"
