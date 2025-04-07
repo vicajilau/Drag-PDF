@@ -50,7 +50,7 @@ dependencies:
   path_provider: ^2.1.5
   pdf: ^3.11.3
   pdf_combiner: ^4.2.5
-  pdfx: ^2.8.0
+  pdfx: ^2.9.0
   platform_detail: ^4.2.0
   share_plus: ^10.1.4
   signature: ^5.5.0
