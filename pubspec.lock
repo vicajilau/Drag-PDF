@@ -577,10 +577,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_combiner
-      sha256: "12e5656cfd38eb5e9df27ab47d0e9bf30f77b45475955502f70e4d2dec5947a3"
+      sha256: f6d9f621d945789c1cff806eb2137ff68ebe4fc6db33c58de551cd5fdc531510
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.2"
+    version: "4.3.3"
   permission_handler:
     dependency: "direct main"
     description:
