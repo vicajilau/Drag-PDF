@@ -1,6 +1,8 @@
 
 # 📄 Welcome to Drag PDF!
 
+
+
 **Drag PDF** is your all-in-one solution for creating and combining PDFs with ease. Whether you're merging multiple documents or building a brand-new PDF from images and other files, we've got you covered.
 
 ## 🚀 What You Can Do:
@@ -8,6 +10,9 @@
 - **Create PDFs**: Generate new PDFs from images, existing PDFs, or a mix of both.
 - **Drag & Drop Simplicity**: Just upload your files and let PDF Fusion do the rest.
 - **Fast & Secure**: Your files are processed quickly and safely, with your privacy in mind.
+
+![](resources/android.png)
+![](resources/ios.png)
 
 
 ## 💡 Get Started
@@ -17,7 +22,7 @@
 4. Download your new PDF!  vicajilau/Drag-PDF
    👉 Go to the download page {% include_relative https://vicajilau.github.io/Drag-PDF/resources/site.html %}
 
-
+![](resources/preview.png)
 
 If you have any problem using the library, you have available our github repository to add a new issue or if you have any proposal, i,ll invite you to doing a pull request with your changes
 
