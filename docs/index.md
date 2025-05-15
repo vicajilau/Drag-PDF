@@ -22,7 +22,41 @@
 
 
 4. Download your new PDF!  vicajilau/Drag-PDF
-   👉 Go to the download page https://vicajilau.github.io/Drag-PDF/resources/site.html
+   👉 Go to the download page 
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descargar App Flutter</title>
+</head>
+<body>
+<h1>Descargar App Flutter</h1>
+<p>Seleccione su sistema operativo para descargar la aplicación:</p>
+<div>
+    <a href="https://example.com/android.apk" download>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android" width="100">
+    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://example.com/ios.ipa" download>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/IOS_logo.svg" alt="iOS" width="100">
+    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://example.com/windows.exe" download>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Unofficial_Windows_logo_variant_-_2002%E2%80%932012_%28Multicolored%29.svg/1200px-Unofficial_Windows_logo_variant_-_2002%E2%80%932012_%28Multicolored%29.svg.png" alt="Windows" width="100">
+    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://example.com/macos.dmg" download>
+        <img src="https://www.seoxan.es/wp-content/uploads/2023/04/macOS.png" alt="macOS" width="100">
+    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://example.com/linux.tar.gz" download>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" alt="Linux" width="100">
+    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://example.com/web.zip" download>
+        <img src="https://svgsilh.com/svg/1873373.svg" alt="Web" width="100">
+    </a><br>
+</div>
+</body>
+</html>
 
 
 
