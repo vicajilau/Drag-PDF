@@ -24,10 +24,8 @@ import 'package:drag_pdf/views/pdf_combiner_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'core/l10n/app_localizations.dart';
-import 'firebase_options.dart';
 
 Future<void> main() async {
-  await DefaultFirebaseOptions.initializeFirebase();
   runApp(const MyApp());
 }
 
