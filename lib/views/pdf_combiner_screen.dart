@@ -216,26 +216,29 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   Widget getFloatButton() {
     if (PlatformDetail.isMobile) {
+      FilePickerResult? result;
       return ExpandableFab(
         distance: 100,
         children: [
           ActionButton(
             onPressed:
                 () async => {
-                  await FilePicker.platform.pickFiles(
+                  result = await FilePicker.platform.pickFiles(
                     type: FileType.image,
                     allowMultiple: true,
                   ),
+                  _pickFiles(result: result)
                 },
             icon: const Icon(Icons.photo),
           ),
           ActionButton(
             onPressed:
                 () async => {
-                  await FilePicker.platform.pickFiles(
+                  result = await FilePicker.platform.pickFiles(
                     type: FileType.any,
                     allowMultiple: true,
                   ),
+                  _pickFiles(result: result)
                 },
             icon: const Icon(Icons.file_upload),
           ),
