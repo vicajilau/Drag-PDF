@@ -22,7 +22,6 @@ class ExpandableFab extends StatefulWidget {
 
 class _ExpandableFabState extends State<ExpandableFab>
     with SingleTickerProviderStateMixin {
-  final FocusNode _focusNode = FocusNode();
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
   bool _open = false;
@@ -31,11 +30,7 @@ class _ExpandableFabState extends State<ExpandableFab>
   void initState() {
     super.initState();
     _open = widget.initialOpen ?? false;
-    _focusNode.addListener((){
-      if(!_focusNode.hasFocus){
-        _buildTapToCloseFab();
-      }
-    });
+
     _controller = AnimationController(
       value: _open ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 250),
@@ -49,7 +44,6 @@ class _ExpandableFabState extends State<ExpandableFab>
   }
   @override
   void dispose() {
-    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -139,7 +133,6 @@ class _ExpandableFabState extends State<ExpandableFab>
           curve: const Interval(0.25, 1.0, curve: Curves.easeInOut),
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
-            focusNode: _focusNode,
             onPressed: _toggle,
             child: const Icon(Icons.add),
           ),
