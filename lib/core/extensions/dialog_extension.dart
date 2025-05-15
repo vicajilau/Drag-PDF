@@ -22,6 +22,7 @@ Public License along with Drag-PDF. If not, see
 import 'dart:io';
 
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
+import 'package:drag_pdf/utils/fileUtils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -52,11 +53,7 @@ extension DialogExtension on BuildContext {
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
-                List<PlatformFile>? scannedDocument = await scanDocument();
-                if (scannedDocument != null) {
-                  FilePickerResult result = FilePickerResult(scannedDocument);
-                  onFilesPicked(result);
-                }
+                scanDocumentProcess(onFilesPicked);
               },
               child: Text(
                 AppLocalizations.of(context)!.select_from_scanner_button,
@@ -118,22 +115,5 @@ extension DialogExtension on BuildContext {
         );
       },
     );
-  }
-
-  Future<List<PlatformFile>?> scanDocument() async {
-    final scannedImage = await CunningDocumentScanner.getPictures();
-
-    if (scannedImage != null) {
-      return scannedImage
-          .map(
-            (element) => PlatformFile(
-              path: element,
-              name: element.split('/').last,
-              size: File(element).lengthSync(),
-            ),
-          )
-          .toList();
-    }
-    return null;
   }
 }

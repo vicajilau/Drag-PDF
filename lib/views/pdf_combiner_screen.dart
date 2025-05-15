@@ -1,5 +1,8 @@
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
+import 'package:drag_pdf/utils/fileUtils.dart';
+import 'package:drag_pdf/views/widgets/expandable/ActionButton.dart';
+import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
 import 'package:file_picker/file_picker.dart';
@@ -131,21 +134,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                           ),
                 ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (PlatformDetail.isMobile) {
-            context.showFilePickerDialog((FilePickerResult? result) {
-              if (result != null) {
-                _pickFiles(result: result);
-              }
-            });
-          } else {
-            _pickFiles();
-          }
-        },
-        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: getFloatButton(),
     );
   }
 
@@ -223,6 +212,57 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         },
       ),
     );
+  }
+
+  Widget getFloatButton() {
+    if (PlatformDetail.isMobile) {
+      return ExpandableFab(
+        distance: 100,
+        children: [
+          ActionButton(
+            onPressed:
+                () async => {
+                  await FilePicker.platform.pickFiles(
+                    type: FileType.image,
+                    allowMultiple: true,
+                  ),
+                },
+            icon: const Icon(Icons.photo),
+          ),
+          ActionButton(
+            onPressed:
+                () async => {
+                  await FilePicker.platform.pickFiles(
+                    type: FileType.any,
+                    allowMultiple: true,
+                  ),
+                },
+            icon: const Icon(Icons.file_upload),
+          ),
+          ActionButton(
+            onPressed:
+                () async => {
+                  scanDocumentProcess((FilePickerResult? result) {
+                    if (result != null) {
+                      _pickFiles(result: result);
+                    } else {
+                      _pickFiles();
+                    }
+                  }),
+                },
+            icon: const Icon(Icons.add_a_photo),
+          ),
+        ],
+      );
+    } else {
+      return FloatingActionButton(
+        onPressed: () {
+          _pickFiles();
+        },
+        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
+        child: const Icon(Icons.add),
+      );
+    }
   }
 
   /// Prepares the files selected by the user using File Picker.
