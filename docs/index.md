@@ -18,7 +18,7 @@
 2. Arrange them in the order you want.
 3. Click **Merge** or **Create**.
 
-![](resources/preview.png)
+![](resources/android_preview.png) ![](resources/ios_preview.png)
 
 
 4. Download your new PDF!  vicajilau/Drag-PDF
