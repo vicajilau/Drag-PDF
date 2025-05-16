@@ -1,6 +1,6 @@
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
-import 'package:drag_pdf/utils/file_utils.dart';
+import 'package:drag_pdf/documentUtils/ScanDocument.dart';
 import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
@@ -27,6 +27,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   double _progress = 0.0;
   late PdfCombinerDelegate delegate;
   final GlobalKey<ExpandableFabState> _fabKey = GlobalKey<ExpandableFabState>();
+  final ScanDocument scanDocument = ScanDocument();
 
   @override
   void initState() {
@@ -257,7 +258,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
             onPressed:
                 () async => {
                   _fabKey.currentState?.close(),
-                  scanDocumentProcess((FilePickerResult? result) {
+                  scanDocument.scanDocumentProcess((FilePickerResult? result) {
                     if (result != null) {
                       _pickFiles(result: result);
                     } else {
