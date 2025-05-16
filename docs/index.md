@@ -21,10 +21,6 @@
 ![](resources/android_preview.png) ![](resources/ios_preview.png)
 
 
-4. Download your new PDF!  vicajilau/Drag-PDF
-   👉 Go to the download page 
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
