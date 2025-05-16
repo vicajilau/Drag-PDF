@@ -74,6 +74,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get select_from_scanner_button => 'Seleccionar desde el escáner';
 
   @override
+  String get select_from_gallery_button => 'Seleccionar desde la galeria';
+
+  @override
   String get cancel_button => 'Cancelar';
 
   @override

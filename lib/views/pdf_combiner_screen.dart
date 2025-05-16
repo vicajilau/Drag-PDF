@@ -234,36 +234,47 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         key: _fabKey,
         distance: 100,
         children: [
-          ActionButton(
-            onPressed:
-                () async => {_fabKey.currentState?.close(), _pickFiles()},
-            icon: const Icon(Icons.image),
+          Tooltip(
+            message: AppLocalizations.of(context)!.add_new_files_tooltip,
+            child: ActionButton(
+              onPressed:
+                  () async => {_fabKey.currentState?.close(), _pickFiles()},
+              icon: const Icon(Icons.image),
+            ),
           ),
-          ActionButton(
-            onPressed:
-                () async => {
-                  _fabKey.currentState?.close(),
-                  result = await FilePicker.platform.pickFiles(
-                    type: FileType.any,
-                    allowMultiple: true,
-                  ),
-                  _pickFiles(result: result),
-                },
-            icon: const Icon(Icons.insert_drive_file),
+          Tooltip(
+            message: AppLocalizations.of(context)!.select_from_device_button,
+            child: ActionButton(
+              onPressed:
+                  () async => {
+                    _fabKey.currentState?.close(),
+                    result = await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                      allowMultiple: true,
+                    ),
+                    _pickFiles(result: result),
+                  },
+              icon: const Icon(Icons.insert_drive_file),
+            ),
           ),
-          ActionButton(
-            onPressed:
-                () async => {
-                  _fabKey.currentState?.close(),
-                  scanDocument.scanDocumentProcess((FilePickerResult? result) {
-                    if (result != null) {
-                      _pickFiles(result: result);
-                    } else {
-                      _pickFiles();
-                    }
-                  }),
-                },
-            icon: const Icon(Icons.document_scanner),
+          Tooltip(
+            message: AppLocalizations.of(context)!.select_from_scanner_button,
+            child: ActionButton(
+              onPressed:
+                  () async => {
+                    _fabKey.currentState?.close(),
+                    scanDocument.scanDocumentProcess((
+                      FilePickerResult? result,
+                    ) {
+                      if (result != null) {
+                        _pickFiles(result: result);
+                      } else {
+                        _pickFiles();
+                      }
+                    }),
+                  },
+              icon: const Icon(Icons.document_scanner),
+            ),
           ),
         ],
       );
@@ -272,7 +283,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         onPressed: () {
           _pickFiles();
         },
-        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
+        tooltip: AppLocalizations.of(context)!.select_from_gallery_button,
         child: const Icon(Icons.add),
       );
     }

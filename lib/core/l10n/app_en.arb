@@ -18,6 +18,7 @@
   "select_files_content_dialog": "Choose how you want to add the files",
   "select_from_device_button": "Select from Device",
   "select_from_scanner_button": "Select from Scanner",
+  "select_from_gallery_button": "Select from Gallery",
   "cancel_button": "Cancel",
   "select_file_type_title_dialog": "What type of file do you want to load?",
   "images_button": "Images"

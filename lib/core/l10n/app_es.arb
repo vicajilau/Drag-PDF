@@ -18,6 +18,7 @@
   "select_files_content_dialog": "Elige cómo quieres añadir los ficheros",
   "select_from_device_button": "Seleccionar desde el dispositivo",
   "select_from_scanner_button": "Seleccionar desde el escáner",
+  "select_from_gallery_button": "Seleccionar desde la galeria",
   "cancel_button": "Cancelar",
   "select_file_type_title_dialog": "¿Qué tipo de fichero quieres cargar?",
   "images_button": "Imágenes"

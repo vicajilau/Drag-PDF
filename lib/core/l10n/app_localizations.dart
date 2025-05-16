@@ -209,6 +209,12 @@ abstract class AppLocalizations {
   /// **'Select from Scanner'**
   String get select_from_scanner_button;
 
+  /// No description provided for @select_from_gallery_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Select from Gallery'**
+  String get select_from_gallery_button;
+
   /// No description provided for @cancel_button.
   ///
   /// In en, this message translates to:
