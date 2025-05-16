@@ -44,7 +44,7 @@ class ScanDocument {
     return null;
   }
 
-
+ /// Function to process scan document
   Future<void> scanDocumentProcess(Function(FilePickerResult?) onFilesPicked) async {
     List<PlatformFile>? scannedDocument = await scanDocument();
     if (scannedDocument != null) {

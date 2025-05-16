@@ -22,6 +22,7 @@ Public License along with Drag-PDF. If not, see
 import 'package:drag_pdf/views/widgets/expandable/expanded_action_button.dart';
 import 'package:flutter/material.dart';
 
+/// Custom component to show a expandable float button
 @immutable
 class ExpandableFab extends StatefulWidget {
   const ExpandableFab({
@@ -100,6 +101,8 @@ class ExpandableFabState extends State<ExpandableFab>
     );
   }
 
+
+  /// Function to close expand float button
   Widget _buildTapToCloseFab() {
     return IgnorePointer(
       ignoring: !_open,
@@ -115,7 +118,7 @@ class ExpandableFabState extends State<ExpandableFab>
       ),
     );
   }
-
+  /// Function to expand float button
   Widget _buildTapToOpenFab() {
     return IgnorePointer(
       ignoring: _open,
@@ -132,6 +135,7 @@ class ExpandableFabState extends State<ExpandableFab>
     );
   }
 
+  /// Function to build expand float button
   List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
     final count = widget.children.length;

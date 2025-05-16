@@ -23,6 +23,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+/// Custom component with animation for floating button
 @immutable
 class ExpandedActionButton extends StatelessWidget {
   const ExpandedActionButton({
