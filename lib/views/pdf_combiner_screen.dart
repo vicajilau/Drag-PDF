@@ -1,7 +1,6 @@
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
 import 'package:drag_pdf/utils/file_utils.dart';
-import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
 import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
@@ -27,11 +26,16 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   final PdfCombinerViewModel _viewModel = PdfCombinerViewModel();
   double _progress = 0.0;
   late PdfCombinerDelegate delegate;
+  final GlobalKey<ExpandableFabState> _fabKey = GlobalKey<ExpandableFabState>();
 
   @override
   void initState() {
     super.initState();
     initDelegate();
+  }
+
+  void _handleTapOutside() {
+    _fabKey.currentState?.close();
   }
 
   void initDelegate() {
@@ -73,67 +77,76 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.titleAppBar),
-        actions: [
-          IconButton(
-            onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
-            icon: const Icon(Icons.restart_alt),
-            tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
+    return GestureDetector(
+          onTap: _handleTapOutside,
+          behavior: HitTestBehavior.translucent,
+          child: Scaffold(
+          appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.titleAppBar),
+            actions: [
+              IconButton(
+                onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
+                icon: const Icon(Icons.restart_alt),
+                tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SafeArea(
-        child:
-            isLoading()
-                ? const LoadingScreen()
-                : DropTarget(
-                  onDragDone: (details) {
-                    setState(() {
-                      _viewModel.addFilesDragAndDrop(details.files);
-                    });
-                  },
-                  child:
-                      (_viewModel.isEmpty())
-                          ? Center(child: Image.asset('assets/files/home.png'))
-                          : Column(
-                            spacing: 20,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (_viewModel.outputFiles.isNotEmpty) ...[
-                                // HERE IS THE OUTPUT SECTION
-                                const SizedBox(),
-                                Text(
-                                  AppLocalizations.of(
-                                    context,
-                                  )!.output_files_title,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+          body: SafeArea(
+            child:
+                isLoading()
+                    ? const LoadingScreen()
+                    : DropTarget(
+                      onDragDone: (details) {
+                        setState(() {
+                          _viewModel.addFilesDragAndDrop(details.files);
+                        });
+                      },
+                      child:
+                          (_viewModel.isEmpty())
+                              ? Center(
+                                child: Image.asset('assets/files/home.png'),
+                              )
+                              : Column(
+                                spacing: 20,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  if (_viewModel.outputFiles.isNotEmpty) ...[
+                                    // HERE IS THE OUTPUT SECTION
+                                    const SizedBox(),
+                                    Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.output_files_title,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    getOutputhFiles(),
+                                    const Divider(),
+                                  ],
+                                  // HERE IS THE INPUT SECTION
+                                  const SizedBox(),
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.input_files_title,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                ),
-                                getOutputhFiles(),
-                                const Divider(),
-                              ],
-                              // HERE IS THE INPUT SECTION
-                              const SizedBox(),
-                              Text(
-                                AppLocalizations.of(context)!.input_files_title,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+                                  getInputFiles(),
+                                  // Buttons Section
+                                  getBottomBarOptions(),
+                                  const SizedBox(height: 20),
+                                ],
                               ),
-                              getInputFiles(),
-                              // Buttons Section
-                              getBottomBarOptions(),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                ),
-      ),
-      floatingActionButton: getFloatButton(),
+                    ),
+          ),
+          floatingActionButton: getFloatButton(),
+        )
     );
   }
 
@@ -217,11 +230,13 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     if (PlatformDetail.isMobile) {
       FilePickerResult? result;
       return ExpandableFab(
+        key: _fabKey,
         distance: 100,
         children: [
           ActionButton(
             onPressed:
                 () async => {
+                  _fabKey.currentState?.close(),
                   result = await FilePicker.platform.pickFiles(
                     type: FileType.image,
                     allowMultiple: true,
@@ -233,6 +248,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
           ActionButton(
             onPressed:
                 () async => {
+                  _fabKey.currentState?.close(),
                   result = await FilePicker.platform.pickFiles(
                     type: FileType.any,
                     allowMultiple: true,
@@ -244,6 +260,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
           ActionButton(
             onPressed:
                 () async => {
+                  _fabKey.currentState?.close(),
                   scanDocumentProcess((FilePickerResult? result) {
                     if (result != null) {
                       _pickFiles(result: result);
