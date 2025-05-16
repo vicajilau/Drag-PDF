@@ -1,7 +1,7 @@
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
-import 'package:drag_pdf/utils/fileUtils.dart';
-import 'package:drag_pdf/views/widgets/expandable/ActionButton.dart';
+import 'package:drag_pdf/utils/file_utils.dart';
+import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
 import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
@@ -12,7 +12,6 @@ import 'package:path/path.dart' as p;
 import 'package:pdf_combiner/pdf_combiner_delegate.dart';
 import 'package:platform_detail/platform_detail.dart';
 
-import '../core/extensions/dialog_extension.dart';
 import '../core/l10n/app_localizations.dart';
 import '../view_models/pdf_combiner_view_model.dart';
 import 'components/loading.dart';
@@ -227,7 +226,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                     type: FileType.image,
                     allowMultiple: true,
                   ),
-                  _pickFiles(result: result)
+                  _pickFiles(result: result),
                 },
             icon: const Icon(Icons.photo),
           ),
@@ -238,7 +237,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                     type: FileType.any,
                     allowMultiple: true,
                   ),
-                  _pickFiles(result: result)
+                  _pickFiles(result: result),
                 },
             icon: const Icon(Icons.file_upload),
           ),

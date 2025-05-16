@@ -19,10 +19,7 @@ You should have received a copy of the GNU Lesser General
 Public License along with Drag-PDF. If not, see
 <https://www.gnu.org/licenses/>.
 */
-import 'dart:io';
-
-import 'package:cunning_document_scanner/cunning_document_scanner.dart';
-import 'package:drag_pdf/utils/fileUtils.dart';
+import 'package:drag_pdf/utils/file_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 

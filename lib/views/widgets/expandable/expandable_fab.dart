@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
+import 'expanded_action_button.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
@@ -42,6 +41,7 @@ class _ExpandableFabState extends State<ExpandableFab>
       parent: _controller,
     );
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -100,12 +100,12 @@ class _ExpandableFabState extends State<ExpandableFab>
     final count = widget.children.length;
     final step = 90.0 / (count - 1);
     for (
-    var i = 0, angleInDegrees = 0.0;
-    i < count;
-    i++, angleInDegrees += step
+      var i = 0, angleInDegrees = 0.0;
+      i < count;
+      i++, angleInDegrees += step
     ) {
       children.add(
-        _ExpandingActionButton(
+        ExpandedActionButton(
           directionInDegrees: angleInDegrees,
           maxDistance: widget.distance,
           progress: _expandAnimation,
@@ -138,43 +138,6 @@ class _ExpandableFabState extends State<ExpandableFab>
           ),
         ),
       ),
-    );
-  }
-}
-
-@immutable
-class _ExpandingActionButton extends StatelessWidget {
-  const _ExpandingActionButton({
-    required this.directionInDegrees,
-    required this.maxDistance,
-    required this.progress,
-    required this.child,
-  });
-
-  final double directionInDegrees;
-  final double maxDistance;
-  final Animation<double> progress;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: progress,
-      builder: (context, child) {
-        final offset = Offset.fromDirection(
-          directionInDegrees * (math.pi / 180.0),
-          progress.value * maxDistance,
-        );
-        return Positioned(
-          right: 4.0 + offset.dx,
-          bottom: 4.0 + offset.dy,
-          child: Transform.rotate(
-            angle: (1.0 - progress.value) * math.pi / 2,
-            child: child!,
-          ),
-        );
-      },
-      child: FadeTransition(opacity: progress, child: child),
     );
   }
 }
