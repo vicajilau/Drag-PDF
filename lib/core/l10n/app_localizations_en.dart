@@ -48,12 +48,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get create_pdf_button => 'Create PDF';
 
   @override
-  String get combine_pdfs_button => 'Combine PDFs';
-
-  @override
-  String get create_pdf_from_images_button => 'Create PDF from images';
-
-  @override
   String get create_images_from_pdf_button => 'Create images from PDF';
 
   @override
@@ -87,10 +81,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get images_button => 'Images';
-
-  @override
-  String get documents_button => 'Documents';
-
-  @override
-  String get not_enough_files_message => 'You need at least 2 PDF files to combine them';
 }

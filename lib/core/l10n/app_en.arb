@@ -20,5 +20,5 @@
   "select_from_scanner_button": "Select from Scanner",
   "cancel_button": "Cancel",
   "select_file_type_title_dialog": "What type of file do you want to load?",
-  "images_button": "Images",
+  "images_button": "Images"
 }
