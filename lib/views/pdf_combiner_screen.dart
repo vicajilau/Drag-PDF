@@ -21,7 +21,6 @@ Public License along with Drag-PDF. If not, see
 */
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
-import 'package:drag_pdf/documentUtils/scan_document.dart';
 import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
 import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
@@ -34,6 +33,7 @@ import 'package:pdf_combiner/pdf_combiner_delegate.dart';
 import 'package:platform_detail/platform_detail.dart';
 
 import '../core/l10n/app_localizations.dart';
+import '../document_utils/scan_document.dart';
 import '../view_models/pdf_combiner_view_model.dart';
 import 'components/loading.dart';
 
@@ -284,7 +284,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
               onPressed:
                   () async => {
                     _fabKey.currentState?.close(),
-                    scanDocument.scanDocumentProcess((
+                    scanDocument.scanDocumentCamera((
                       FilePickerResult? result,
                     ) {
                       if (result != null) {

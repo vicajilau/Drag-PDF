@@ -26,8 +26,8 @@ import 'package:file_picker/file_picker.dart';
 
 class ScanDocument {
 
-  /// Function to pick an image from camera
-  Future<List<PlatformFile>?> scanDocument() async {
+  /// Function to launches the device’s camera to allow the user to capture an image of a document. This function handles permission requests and initiates the camera interface.
+  Future<List<PlatformFile>?> scanDocumentProcess() async {
     final scannedImage = await CunningDocumentScanner.getPictures();
 
     if (scannedImage != null) {
@@ -44,9 +44,9 @@ class ScanDocument {
     return null;
   }
 
- /// Function to process scan document
-  Future<void> scanDocumentProcess(Function(FilePickerResult?) onFilesPicked) async {
-    List<PlatformFile>? scannedDocument = await scanDocument();
+  /// Function to Processes the image captured from the camera, optimizing it for use as a document
+  Future<void> scanDocumentCamera(Function(FilePickerResult?) onFilesPicked) async {
+    List<PlatformFile>? scannedDocument = await scanDocumentProcess();
     if (scannedDocument != null) {
       FilePickerResult result = FilePickerResult(scannedDocument);
       return onFilesPicked(result);
