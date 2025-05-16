@@ -1,6 +1,7 @@
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
 import 'package:drag_pdf/documentUtils/scan_document.dart';
+import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
 import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
@@ -79,75 +80,74 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-          onTap: _handleTapOutside,
-          behavior: HitTestBehavior.translucent,
-          child: Scaffold(
-          appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.titleAppBar),
-            actions: [
-              IconButton(
-                onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
-                icon: const Icon(Icons.restart_alt),
-                tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
-              ),
-            ],
-          ),
-          body: SafeArea(
-            child:
-                isLoading()
-                    ? const LoadingScreen()
-                    : DropTarget(
-                      onDragDone: (details) {
-                        setState(() {
-                          _viewModel.addFilesDragAndDrop(details.files);
-                        });
-                      },
-                      child:
-                          (_viewModel.isEmpty())
-                              ? Center(
-                                child: Image.asset('assets/files/home.png'),
-                              )
-                              : Column(
-                                spacing: 20,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  if (_viewModel.outputFiles.isNotEmpty) ...[
-                                    // HERE IS THE OUTPUT SECTION
-                                    const SizedBox(),
-                                    Text(
-                                      AppLocalizations.of(
-                                        context,
-                                      )!.output_files_title,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    getOutputhFiles(),
-                                    const Divider(),
-                                  ],
-                                  // HERE IS THE INPUT SECTION
+      onTap: _handleTapOutside,
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.titleAppBar),
+          actions: [
+            IconButton(
+              onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
+              icon: const Icon(Icons.restart_alt),
+              tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child:
+              isLoading()
+                  ? const LoadingScreen()
+                  : DropTarget(
+                    onDragDone: (details) {
+                      setState(() {
+                        _viewModel.addFilesDragAndDrop(details.files);
+                      });
+                    },
+                    child:
+                        (_viewModel.isEmpty())
+                            ? Center(
+                              child: Image.asset('assets/files/home.png'),
+                            )
+                            : Column(
+                              spacing: 20,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                if (_viewModel.outputFiles.isNotEmpty) ...[
+                                  // HERE IS THE OUTPUT SECTION
                                   const SizedBox(),
                                   Text(
                                     AppLocalizations.of(
                                       context,
-                                    )!.input_files_title,
+                                    )!.output_files_title,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                     ),
                                   ),
-                                  getInputFiles(),
-                                  // Buttons Section
-                                  getBottomBarOptions(),
-                                  const SizedBox(height: 20),
+                                  getOutputhFiles(),
+                                  const Divider(),
                                 ],
-                              ),
-                    ),
-          ),
-          floatingActionButton: getFloatButton(),
-        )
+                                // HERE IS THE INPUT SECTION
+                                const SizedBox(),
+                                Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.input_files_title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                getInputFiles(),
+                                // Buttons Section
+                                getBottomBarOptions(),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                  ),
+        ),
+        floatingActionButton: getFloatButton(),
+      ),
     );
   }
 
@@ -236,10 +236,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         children: [
           ActionButton(
             onPressed:
-                () async => {
-                  _fabKey.currentState?.close(),
-                  _pickFiles(),
-                },
+                () async => {_fabKey.currentState?.close(), _pickFiles()},
             icon: const Icon(Icons.image),
           ),
           ActionButton(

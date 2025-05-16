@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+@immutable
 class ActionButton extends StatelessWidget {
   const ActionButton({super.key, this.onPressed, required this.icon});
 

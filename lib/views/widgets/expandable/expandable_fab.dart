@@ -1,5 +1,5 @@
+import 'package:drag_pdf/views/widgets/expandable/expanded_action_button.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 @immutable
 class ExpandableFab extends StatefulWidget {
@@ -23,8 +23,6 @@ class ExpandableFabState extends State<ExpandableFab>
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
   bool _open = false;
-
-
 
   @override
   void initState() {
@@ -123,7 +121,7 @@ class ExpandableFabState extends State<ExpandableFab>
       i++, angleInDegrees += step
     ) {
       children.add(
-        _ExpandingActionButton(
+        ExpandedActionButton(
           directionInDegrees: angleInDegrees,
           maxDistance: widget.distance,
           progress: _expandAnimation,
@@ -132,60 +130,5 @@ class ExpandableFabState extends State<ExpandableFab>
       );
     }
     return children;
-  }
-}
-
-class _ExpandingActionButton extends StatelessWidget {
-  const _ExpandingActionButton({
-    required this.directionInDegrees,
-    required this.maxDistance,
-    required this.progress,
-    required this.child,
-  });
-
-  final double directionInDegrees;
-  final double maxDistance;
-  final Animation<double> progress;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final angleInRadians = directionInDegrees * (math.pi / 180.0);
-    return AnimatedBuilder(
-      animation: progress,
-      builder: (context, child) {
-        final offset = Offset.fromDirection(
-          angleInRadians,
-          progress.value * maxDistance,
-        );
-        return Positioned(
-          right: 4.0 + offset.dx,
-          bottom: 4.0 + offset.dy,
-          child: Transform.rotate(
-            angle: (1.0 - progress.value) * math.pi / 2,
-            child: child,
-          ),
-        );
-      },
-      child: FadeTransition(opacity: progress, child: child),
-    );
-  }
-}
-
-class ActionButton extends StatelessWidget {
-  const ActionButton({super.key, required this.onPressed, required this.icon});
-
-  final VoidCallback onPressed;
-  final Widget icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      color: Theme.of(context).colorScheme.secondary,
-      elevation: 4.0,
-      child: IconButton(onPressed: onPressed, icon: icon, color: Colors.white),
-    );
   }
 }
