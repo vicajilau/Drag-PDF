@@ -161,18 +161,6 @@ abstract class AppLocalizations {
   /// **'Create PDF'**
   String get create_pdf_button;
 
-  /// No description provided for @combine_pdfs_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Combine PDFs'**
-  String get combine_pdfs_button;
-
-  /// No description provided for @create_pdf_from_images_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Create PDF from images'**
-  String get create_pdf_from_images_button;
-
   /// No description provided for @create_images_from_pdf_button.
   ///
   /// In en, this message translates to:
@@ -221,6 +209,12 @@ abstract class AppLocalizations {
   /// **'Select from Scanner'**
   String get select_from_scanner_button;
 
+  /// No description provided for @select_from_gallery_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Select from Gallery'**
+  String get select_from_gallery_button;
+
   /// No description provided for @cancel_button.
   ///
   /// In en, this message translates to:
@@ -238,18 +232,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Images'**
   String get images_button;
-
-  /// No description provided for @documents_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Documents'**
-  String get documents_button;
-
-  /// No description provided for @not_enough_files_message.
-  ///
-  /// In en, this message translates to:
-  /// **'You need at least 2 PDF files to combine them'**
-  String get not_enough_files_message;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

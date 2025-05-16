@@ -48,12 +48,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get create_pdf_button => 'Crear PDF';
 
   @override
-  String get combine_pdfs_button => 'Combinar PDFs';
-
-  @override
-  String get create_pdf_from_images_button => 'Crear PDF desde imágenes';
-
-  @override
   String get create_images_from_pdf_button => 'Crear imágenes desde PDF';
 
   @override
@@ -80,6 +74,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get select_from_scanner_button => 'Seleccionar desde el escáner';
 
   @override
+  String get select_from_gallery_button => 'Seleccionar desde la galeria';
+
+  @override
   String get cancel_button => 'Cancelar';
 
   @override
@@ -87,10 +84,4 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get images_button => 'Imágenes';
-
-  @override
-  String get documents_button => 'Documentos';
-
-  @override
-  String get not_enough_files_message => 'Necesitas al menos 2 ficheros PDF para combinarlos.';
 }
