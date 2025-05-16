@@ -51,7 +51,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" alt="Linux" width="100">
     </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://example.com/web.zip" download>
-        <img src="https://svgsilh.com/svg/1873373.svg" alt="Web" width="100">
+        <img src="https://rocxmarketing.com/wp-content/uploads/2023/07/WEB-3.0.png" alt="Web" width="100">
     </a><br>
 </div>
 </body>
