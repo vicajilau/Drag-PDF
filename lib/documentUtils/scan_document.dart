@@ -26,7 +26,7 @@ import 'package:file_picker/file_picker.dart';
 
 class ScanDocument {
 
-  //function to pick an image from camera
+  /// Function to pick an image from camera
   Future<List<PlatformFile>?> scanDocument() async {
     final scannedImage = await CunningDocumentScanner.getPictures();
 
