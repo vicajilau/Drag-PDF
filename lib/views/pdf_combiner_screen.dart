@@ -235,7 +235,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         distance: 100,
         children: [
           Tooltip(
-            message: AppLocalizations.of(context)!.add_new_files_tooltip,
+            message: AppLocalizations.of(context)!.select_from_gallery_button,
             child: ActionButton(
               onPressed:
                   () async => {_fabKey.currentState?.close(), _pickFiles()},
@@ -283,7 +283,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         onPressed: () {
           _pickFiles();
         },
-        tooltip: AppLocalizations.of(context)!.select_from_gallery_button,
+        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
         child: const Icon(Icons.add),
       );
     }
