@@ -25,6 +25,8 @@ import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:file_picker/file_picker.dart';
 
 class ScanDocument {
+
+  //function to pick an image from camera
   Future<List<PlatformFile>?> scanDocument() async {
     final scannedImage = await CunningDocumentScanner.getPictures();
 
@@ -41,6 +43,8 @@ class ScanDocument {
     }
     return null;
   }
+
+
   Future<void> scanDocumentProcess(Function(FilePickerResult?) onFilesPicked) async {
     List<PlatformFile>? scannedDocument = await scanDocument();
     if (scannedDocument != null) {
