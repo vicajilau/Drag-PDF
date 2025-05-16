@@ -228,7 +228,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                   ),
                   _pickFiles(result: result),
                 },
-            icon: const Icon(Icons.photo),
+            icon: const Icon(Icons.image),
           ),
           ActionButton(
             onPressed:
@@ -239,7 +239,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                   ),
                   _pickFiles(result: result),
                 },
-            icon: const Icon(Icons.file_upload),
+            icon: const Icon(Icons.insert_drive_file),
           ),
           ActionButton(
             onPressed:
@@ -252,7 +252,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                     }
                   }),
                 },
-            icon: const Icon(Icons.add_a_photo),
+            icon: const Icon(Icons.document_scanner),
           ),
         ],
       );
