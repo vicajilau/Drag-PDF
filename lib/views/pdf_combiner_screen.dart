@@ -237,11 +237,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
             onPressed:
                 () async => {
                   _fabKey.currentState?.close(),
-                  result = await FilePicker.platform.pickFiles(
-                    type: FileType.image,
-                    allowMultiple: true,
-                  ),
-                  _pickFiles(result: result),
+                  _pickFiles(),
                 },
             icon: const Icon(Icons.image),
           ),
