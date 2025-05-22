@@ -60,7 +60,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get snackbar_app_restart => 'App reiniciada con éxito!';
 
   @override
-  String get snackbar_copy_output_to_clipboard => 'Ruta de salida copiada al portapapeles';
+  String get snackbar_copy_output_to_clipboard =>
+      'Ruta de salida copiada al portapapeles';
 
   @override
   String failed_open_file(Object error) {
@@ -71,7 +72,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get select_files_title_dialog => 'Selecciona ficheros';
 
   @override
-  String get select_files_content_dialog => 'Elige cómo quieres añadir los ficheros';
+  String get select_files_content_dialog =>
+      'Elige cómo quieres añadir los ficheros';
 
   @override
   String get select_from_device_button => 'Seleccionar desde el dispositivo';
@@ -83,7 +85,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cancel_button => 'Cancelar';
 
   @override
-  String get select_file_type_title_dialog => '¿Qué tipo de fichero quieres cargar?';
+  String get select_file_type_title_dialog =>
+      '¿Qué tipo de fichero quieres cargar?';
 
   @override
   String get images_button => 'Imágenes';
@@ -92,5 +95,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get documents_button => 'Documentos';
 
   @override
-  String get not_enough_files_message => 'Necesitas al menos 2 ficheros PDF para combinarlos.';
+  String get not_enough_files_message =>
+      'Necesitas al menos 2 ficheros PDF para combinarlos.';
 }

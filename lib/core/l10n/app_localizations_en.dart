@@ -60,7 +60,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get snackbar_app_restart => 'App restarted successfully!';
 
   @override
-  String get snackbar_copy_output_to_clipboard => 'Output path copied to clipboard';
+  String get snackbar_copy_output_to_clipboard =>
+      'Output path copied to clipboard';
 
   @override
   String failed_open_file(Object error) {
@@ -71,7 +72,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get select_files_title_dialog => 'Select Files';
 
   @override
-  String get select_files_content_dialog => 'Choose how you want to add the files';
+  String get select_files_content_dialog =>
+      'Choose how you want to add the files';
 
   @override
   String get select_from_device_button => 'Select from Device';
@@ -83,7 +85,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel_button => 'Cancel';
 
   @override
-  String get select_file_type_title_dialog => 'What type of file do you want to load?';
+  String get select_file_type_title_dialog =>
+      'What type of file do you want to load?';
 
   @override
   String get images_button => 'Images';
@@ -92,5 +95,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get documents_button => 'Documents';
 
   @override
-  String get not_enough_files_message => 'You need at least 2 PDF files to combine them';
+  String get not_enough_files_message =>
+      'You need at least 2 PDF files to combine them';
 }
