@@ -1,5 +1,28 @@
+/*
+Copyright 2022-2025 Victor Carreras
+
+This file is part of Drag-PDF.
+
+Drag-PDF is free software: you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any
+later version.
+
+Drag-PDF is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the GNU Lesser General Public License for more
+details.
+
+You should have received a copy of the GNU Lesser General
+Public License along with Drag-PDF. If not, see
+<https://www.gnu.org/licenses/>.
+*/
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
+import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
+import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,8 +32,8 @@ import 'package:path/path.dart' as p;
 import 'package:pdf_combiner/pdf_combiner_delegate.dart';
 import 'package:platform_detail/platform_detail.dart';
 
-import '../core/extensions/dialog_extension.dart';
 import '../core/l10n/app_localizations.dart';
+import '../document_utils/scan_document.dart';
 import '../view_models/pdf_combiner_view_model.dart';
 import 'components/loading.dart';
 
@@ -25,11 +48,17 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   final PdfCombinerViewModel _viewModel = PdfCombinerViewModel();
   double _progress = 0.0;
   late PdfCombinerDelegate delegate;
+  final GlobalKey<ExpandableFabState> _fabKey = GlobalKey<ExpandableFabState>();
+  final ScanDocument scanDocument = ScanDocument();
 
   @override
   void initState() {
     super.initState();
     initDelegate();
+  }
+
+  void _handleTapOutside() {
+    _fabKey.currentState?.close();
   }
 
   void initDelegate() {
@@ -71,80 +100,74 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.titleAppBar),
-        actions: [
-          IconButton(
-            onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
-            icon: const Icon(Icons.restart_alt),
-            tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child:
-            isLoading()
-                ? const LoadingScreen()
-                : DropTarget(
-                  onDragDone: (details) {
-                    setState(() {
-                      _viewModel.addFilesDragAndDrop(details.files);
-                    });
-                  },
-                  child:
-                      (_viewModel.isEmpty())
-                          ? Center(child: Image.asset('assets/files/home.png'))
-                          : Column(
-                            spacing: 20,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (_viewModel.outputFiles.isNotEmpty) ...[
-                                // HERE IS THE OUTPUT SECTION
+    return GestureDetector(
+      onTap: _handleTapOutside,
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.titleAppBar),
+          actions: [
+            IconButton(
+              onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
+              icon: const Icon(Icons.restart_alt),
+              tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child:
+              isLoading()
+                  ? const LoadingScreen()
+                  : DropTarget(
+                    onDragDone: (details) {
+                      setState(() {
+                        _viewModel.addFilesDragAndDrop(details.files);
+                      });
+                    },
+                    child:
+                        (_viewModel.isEmpty())
+                            ? Center(
+                              child: Image.asset('assets/files/home.png'),
+                            )
+                            : Column(
+                              spacing: 20,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                if (_viewModel.outputFiles.isNotEmpty) ...[
+                                  // HERE IS THE OUTPUT SECTION
+                                  const SizedBox(),
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.output_files_title,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  getOutputhFiles(),
+                                  const Divider(),
+                                ],
+                                // HERE IS THE INPUT SECTION
                                 const SizedBox(),
                                 Text(
                                   AppLocalizations.of(
                                     context,
-                                  )!.output_files_title,
+                                  )!.input_files_title,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
                                 ),
-                                getOutputhFiles(),
-                                const Divider(),
+                                getInputFiles(),
+                                // Buttons Section
+                                getBottomBarOptions(),
+                                const SizedBox(height: 20),
                               ],
-                              // HERE IS THE INPUT SECTION
-                              const SizedBox(),
-                              Text(
-                                AppLocalizations.of(context)!.input_files_title,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              getInputFiles(),
-                              // Buttons Section
-                              getBottomBarOptions(),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (PlatformDetail.isMobile) {
-            context.showFilePickerDialog((FilePickerResult? result) {
-              if (result != null) {
-                _pickFiles(result: result);
-              }
-            });
-          } else {
-            _pickFiles();
-          }
-        },
-        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
-        child: const Icon(Icons.add),
+                            ),
+                  ),
+        ),
+        floatingActionButton: getFloatButton(),
       ),
     );
   }
@@ -223,6 +246,68 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         },
       ),
     );
+  }
+
+  Widget getFloatButton() {
+    if (PlatformDetail.isMobile) {
+      FilePickerResult? result;
+      return ExpandableFab(
+        key: _fabKey,
+        distance: 100,
+        children: [
+          Tooltip(
+            message: AppLocalizations.of(context)!.select_from_gallery_button,
+            child: ActionButton(
+              onPressed:
+                  () async => {_fabKey.currentState?.close(), _pickFiles()},
+              icon: const Icon(Icons.image),
+            ),
+          ),
+          Tooltip(
+            message: AppLocalizations.of(context)!.select_from_device_button,
+            child: ActionButton(
+              onPressed:
+                  () async => {
+                    _fabKey.currentState?.close(),
+                    result = await FilePicker.platform.pickFiles(
+                      type: FileType.any,
+                      allowMultiple: true,
+                    ),
+                    _pickFiles(result: result),
+                  },
+              icon: const Icon(Icons.insert_drive_file),
+            ),
+          ),
+          Tooltip(
+            message: AppLocalizations.of(context)!.select_from_scanner_button,
+            child: ActionButton(
+              onPressed:
+                  () async => {
+                    _fabKey.currentState?.close(),
+                    scanDocument.scanDocumentCamera((
+                      FilePickerResult? result,
+                    ) {
+                      if (result != null) {
+                        _pickFiles(result: result);
+                      } else {
+                        _pickFiles();
+                      }
+                    }),
+                  },
+              icon: const Icon(Icons.document_scanner),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return FloatingActionButton(
+        onPressed: () {
+          _pickFiles();
+        },
+        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
+        child: const Icon(Icons.add),
+      );
+    }
   }
 
   /// Prepares the files selected by the user using File Picker.
