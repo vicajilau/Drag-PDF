@@ -29,6 +29,7 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: Color(0xFF1D2353),
       error: errorColor,
+      onSecondary: Colors.white,
     ),
     scaffoldBackgroundColor: Color(0xFFAAD1F0),
     appBarTheme: const AppBarTheme(
@@ -77,6 +78,7 @@ class AppTheme {
       primary: Colors.white,
       surface: Color(0xFF1E1E1E),
       error: errorColor,
+      onSecondary: Colors.black87,
     ),
     scaffoldBackgroundColor: const Color(0xFF303030),
     appBarTheme: const AppBarTheme(
