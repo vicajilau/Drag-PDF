@@ -64,15 +64,22 @@ class PdfCombinerViewModel {
       for (var element in result.files) {
         debugPrint("${element.name}, ");
       }
-      final files =
-          result.files
-              .where((file) => file.path != null)
-              .map((file) => File(file.path!))
-              .toList();
-      _addFiles(files);
+      prepareFiles(result);
     }
   }
 
+
+  Future<void> prepareFiles(FilePickerResult? result)async {
+    final files =
+    result?.files
+        .where((file) => file.path != null)
+        .map((file) => File(file.path!))
+        .toList();
+    if(files != null){
+      _addFiles(files);
+    }
+
+  }
   /// drag-and-drop functionality for adding files.
   ///
   /// This function allows users to drag files into the designated area,

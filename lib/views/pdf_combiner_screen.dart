@@ -265,7 +265,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                       type: FileType.any,
                       allowMultiple: true,
                     ),
-                    _pickFiles(result: result),
+                    _prepareFiles(result: result),
                   },
               icon: const Icon(Icons.insert_drive_file),
             ),
@@ -414,6 +414,12 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     await _viewModel.pickImages(result);
     setState(() {});
   }
+
+    Future<void> _prepareFiles({FilePickerResult? result}) async {
+    await _viewModel.prepareFiles(result);
+    setState(() {});
+  }
+
 
   /// Resets the input and output files.
   ///
