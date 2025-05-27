@@ -34,27 +34,18 @@ class PdfCombinerViewModel {
   List<String> selectedFiles = []; // List to store selected PDF file paths
   List<String> outputFiles = []; // Path for the combined output file
 
-  /// Pick PDF files from the device (old method)
-  Future<void> pickFiles(FilePickerResult? result) async {
-    result ??= await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'png'],
-      allowMultiple: true, // Allow picking multiple files
-    );
-    if (result != null && result.files.isNotEmpty) {
-      for (var element in result.files) {
-        debugPrint("${element.name}, ");
-      }
-      final files =
-          result.files
-              .where((file) => file.path != null)
-              .map((file) => File(file.path!))
-              .toList();
-      _addFiles(files);
-    }
-  }
-
-  /// Pick images from the device
+  /// Allows the user to pick multiple image files and processes them.
+  ///
+  /// If a [result] is not provided, this function launches the file picker
+  /// to let the user select multiple image files. If a [result] is provided,
+  /// it is used directly.
+  ///
+  /// After picking or receiving the files, their names are printed to the
+  /// debug console. Then, the files are passed to [prepareFiles] for further processing.
+  ///
+  /// - Parameter [result]: Optional [FilePickerResult]. If `null`, the file picker will be shown.
+  ///
+  /// - Returns: A [Future] that completes when image selection and processing are done.
   Future<void> pickImages(FilePickerResult? result) async {
     result ??= await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -64,11 +55,30 @@ class PdfCombinerViewModel {
       for (var element in result.files) {
         debugPrint("${element.name}, ");
       }
-      final files =
-          result.files
-              .where((file) => file.path != null)
-              .map((file) => File(file.path!))
-              .toList();
+      prepareFiles(result);
+    }
+  }
+
+  /// Prepares a list of files from the result of a file picker operation.
+  ///
+  /// This function processes a [FilePickerResult] by filtering out entries
+  /// that don't have a valid file path (`file.path != null`), converting the
+  /// valid ones into [File] objects, and passing them to the [_addFiles]
+  /// method for further handling.
+  ///
+  /// If [result] is `null` or contains no valid file paths, the function
+  /// does nothing.
+  ///
+  /// - Parameter [result]: The result returned from a file picker. May be `null`.
+  ///
+  /// - Returns: A [Future] that completes when file preparation is finished.
+  Future<void> prepareFiles(FilePickerResult? result) async {
+    final files =
+        result?.files
+            .where((file) => file.path != null)
+            .map((file) => File(file.path!))
+            .toList();
+    if (files != null) {
       _addFiles(files);
     }
   }
