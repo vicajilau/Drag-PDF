@@ -34,7 +34,7 @@ class PdfCombinerViewModel {
   List<String> selectedFiles = []; // List to store selected PDF file paths
   List<String> outputFiles = []; // Path for the combined output file
 
-  /// Function to pick PDF files from the device (old method)
+  /// Pick PDF files from the device (old method)
   Future<void> pickFiles(FilePickerResult? result) async {
     result ??= await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -54,7 +54,7 @@ class PdfCombinerViewModel {
     }
   }
 
-  /// Function to pick images from the device
+  /// Pick images from the device
   Future<void> pickImages(FilePickerResult? result) async {
     result ??= await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -92,19 +92,19 @@ class PdfCombinerViewModel {
   /// @return `true` if the collection is empty, `false` otherwise.
   bool isEmpty() => selectedFiles.isEmpty;
 
-  /// Function to pick PDF files from the device
+  /// Pick PDF files from the device
   Future<void> _addFiles(List<File> files) async {
     selectedFiles += files.map((file) => file.path).toList();
     outputFiles = [];
   }
 
-  /// Function to restart the selected files
+  /// Restart the selected files
   void restart() {
     selectedFiles = [];
     outputFiles = [];
   }
 
-  /// Function to combine selected PDF files into a single output file
+  /// Combine selected PDF files into a single output file
   Future<void> combinePdfs(PdfCombinerDelegate delegate) async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
@@ -116,7 +116,7 @@ class PdfCombinerViewModel {
     ); // Combine the PDFs
   }
 
-  /// Function to create a PDF file from a list of images
+  /// Create a PDF file from a list of images
   Future<void> createPDFFromImages(PdfCombinerDelegate delegate) async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
@@ -127,7 +127,7 @@ class PdfCombinerViewModel {
     );
   }
 
-  /// Function to create a PDF file from a list of documents
+  /// Create a PDF file from a list of documents
   Future<void> createPDFFromDocuments(PdfCombinerDelegate delegate) async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
@@ -138,7 +138,7 @@ class PdfCombinerViewModel {
     );
   }
 
-  /// Function to create a PDF file from a list of images
+  /// Create a PDF file from a list of images
   Future<void> createImagesFromPDF(PdfCombinerDelegate delegate) async {
     final directory = await _getOutputDirectory();
     final outputFilePath = '${directory?.path}';
@@ -149,7 +149,7 @@ class PdfCombinerViewModel {
     );
   }
 
-  /// Function to get the appropriate directory for saving the output file
+  /// Get the appropriate directory for saving the output file
   Future<Directory?> _getOutputDirectory() async {
     if (PlatformDetail.isIOS || PlatformDetail.isDesktop) {
       return await getApplicationDocumentsDirectory(); // For iOS & Desktop, return the documents directory
@@ -164,7 +164,7 @@ class PdfCombinerViewModel {
     }
   }
 
-  /// Function to copy the output file path to the clipboard
+  /// Copy the output file path to the clipboard
   Future<void> copyOutputToClipboard(int index) async {
     if (outputFiles.isNotEmpty) {
       await Clipboard.setData(
@@ -173,7 +173,7 @@ class PdfCombinerViewModel {
     }
   }
 
-  /// Function to copy the selected files' paths to the clipboard
+  /// Copy the selected files' paths to the clipboard
   Future<void> copySelectedFilesToClipboard(int index) async {
     if (selectedFiles.isNotEmpty) {
       await Clipboard.setData(
@@ -182,8 +182,12 @@ class PdfCombinerViewModel {
     }
   }
 
-  /// Function to remove the selected files
+  /// Removes the selected files
   void removeFileAt(int index) {
     selectedFiles.removeAt(index);
   }
+
+  /// Detects if the selected files are not a single PDF file
+  bool isNotSinglePdfLoaded() =>
+      selectedFiles.length != 1 || !selectedFiles.first.endsWith('.pdf');
 }

@@ -90,14 +90,6 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   bool isLoading() => _progress != 0.0 && _progress != 1.0;
 
-  bool isPdfButtonDisabled() =>
-      _viewModel.selectedFiles.isEmpty ||
-      (_viewModel.selectedFiles.length == 1 &&
-          _viewModel.selectedFiles.first.endsWith('.pdf'));
-  bool isImagesFromPdfButtonDisabled() =>
-      _viewModel.selectedFiles.length != 1 ||
-      !_viewModel.selectedFiles.first.endsWith('.pdf');
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -284,9 +276,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
               onPressed:
                   () async => {
                     _fabKey.currentState?.close(),
-                    scanDocument.scanDocumentCamera((
-                      FilePickerResult? result,
-                    ) {
+                    scanDocument.scanDocumentCamera((FilePickerResult? result) {
                       if (result != null) {
                         _pickFiles(result: result);
                       } else {
@@ -396,17 +386,18 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         spacing: 10,
         children: [
           const SizedBox(),
-          ElevatedButton(
-            onPressed: isPdfButtonDisabled() ? null : _createPdfFromMix,
-            child: Text(AppLocalizations.of(context)!.create_pdf_button),
-          ),
-          ElevatedButton(
-            onPressed:
-                isImagesFromPdfButtonDisabled() ? null : _createImagesFromPDF,
-            child: Text(
-              AppLocalizations.of(context)!.create_images_from_pdf_button,
-            ),
-          ),
+          _viewModel.isNotSinglePdfLoaded()
+              ? ElevatedButton(
+                onPressed: _createPdfFromMix,
+                child: Text(AppLocalizations.of(context)!.create_pdf_button),
+              )
+              : ElevatedButton(
+                onPressed: _createImagesFromPDF,
+                child: Text(
+                  AppLocalizations.of(context)!.create_images_from_pdf_button,
+                ),
+              ),
+
           const SizedBox(),
         ],
       ),
