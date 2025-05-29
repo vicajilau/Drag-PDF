@@ -45,9 +45,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Lottie.asset('assets/animations/loading.json'),
-      ),
+      body: Center(child: Lottie.asset('assets/animations/loading.json')),
     );
   }
 }

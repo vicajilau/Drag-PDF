@@ -19,8 +19,9 @@ You should have received a copy of the GNU Lesser General
 Public License along with Drag-PDF. If not, see
 <https://www.gnu.org/licenses/>.
 */
-import 'package:drag_pdf/views/widgets/expandable/expanded_action_button.dart';
 import 'package:flutter/material.dart';
+
+import 'expanded_action_button.dart';
 
 /// Custom component to show a expandable float button
 @immutable

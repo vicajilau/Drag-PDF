@@ -415,11 +415,10 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     setState(() {});
   }
 
-    Future<void> _prepareFiles({FilePickerResult? result}) async {
+  Future<void> _prepareFiles({FilePickerResult? result}) async {
     await _viewModel.prepareFiles(result);
     setState(() {});
   }
-
 
   /// Resets the input and output files.
   ///
