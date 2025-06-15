@@ -46,6 +46,7 @@ class PdfCombinerScreen extends StatefulWidget {
 
 class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   final PdfCombinerViewModel _viewModel = PdfCombinerViewModel();
+  bool _pickingFiles = false;
   double _progress = 0.0;
   late PdfCombinerDelegate delegate;
   final GlobalKey<ExpandableFabState> _fabKey = GlobalKey<ExpandableFabState>();
@@ -100,7 +101,10 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
           title: Text(AppLocalizations.of(context)!.titleAppBar),
           actions: [
             IconButton(
-              onPressed: _viewModel.selectedFiles.isEmpty ? null : _restart,
+              onPressed:
+                  _viewModel.selectedFiles.isEmpty || _pickingFiles
+                      ? null
+                      : _restart,
               icon: const Icon(Icons.restart_alt),
               tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
             ),
@@ -291,9 +295,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
       );
     } else {
       return FloatingActionButton(
-        onPressed: () {
-          _pickFiles();
-        },
+        onPressed: () => _pickingFiles ? null : _pickFiles(),
         tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
         child: const Icon(Icons.add),
       );
@@ -411,8 +413,13 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   ///
   /// @return Void
   Future<void> _pickFiles({FilePickerResult? result}) async {
+    setState(() {
+      _pickingFiles = true;
+    });
     await _viewModel.pickImages(result);
-    setState(() {});
+    setState(() {
+      _pickingFiles = false;
+    });
   }
 
   Future<void> _prepareFiles({FilePickerResult? result}) async {
@@ -430,6 +437,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     _viewModel.restart();
     setState(() {
       _progress = 0.0;
+      _pickingFiles = false;
     });
     _showSnackbarSafely(AppLocalizations.of(context)!.snackbar_app_restart);
   }
