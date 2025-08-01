@@ -1,11 +1,11 @@
 {
-    "name": "drag_pdf",
-    "short_name": "drag_pdf",
+    "name": "Drag PDF",
+    "short_name": "Drag PDF",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#hexcode",
     "theme_color": "#hexcode",
-    "description": "A new Flutter project.",
+    "description": "A web application for easily dragging, combining, and creating PDF files.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
