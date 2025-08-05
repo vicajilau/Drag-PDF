@@ -70,10 +70,12 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         });
       },
       onError: (error) {
+        print('hay un error en el proceso de combinado de archivos: $error');
         _showSnackbarSafely(error.toString());
       },
       onSuccess: (paths) {
         setState(() {
+          print('El proceso de combinado fue exitoso con estas paths: $paths');
           _viewModel.outputFiles = paths;
         });
         String message = AppLocalizations.of(
