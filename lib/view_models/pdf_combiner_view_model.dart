@@ -139,8 +139,11 @@ class PdfCombinerViewModel {
 
   /// Create a PDF file from a list of documents
   Future<void> createPDFFromDocuments(PdfCombinerDelegate delegate) async {
+    print("entro dentro del createPDFFromDocuments");
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
+    print("entro dentro del createPDFFromDocuments con la siguiente info: directorio: ${await _getOutputDirectory()}, filePath: ${directory?.path},"
+        " outputFilePath: $outputFilePath, archivos seleccionados(tamaño): ${selectedFiles.length}, archivos seleccionados: ${selectedFiles.toString()}");
     await PdfCombiner.generatePDFFromDocuments(
       inputPaths: selectedFiles,
       outputPath: outputFilePath,
