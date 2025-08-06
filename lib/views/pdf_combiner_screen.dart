@@ -57,6 +57,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   void initState() {
     super.initState();
     initDelegate();
+    print('Iniciamos el combiner');
   }
 
   void _handleTapOutside() {
