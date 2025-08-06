@@ -304,6 +304,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         ],
       );
     } else {
+      print("entro en el floatButton, preparando archivos con pick files a  $_pickingFiles");
       return FloatingActionButton(
         onPressed: () => _pickingFiles ? null : _pickFiles(),
         tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
@@ -391,6 +392,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   ///
   /// @return A `Widget` representing the bottom bar with action buttons for input files.
   Widget getBottomBarOptions() {
+    print("entro en getBottomBarOptions y el isnotSinglePdfLoaded es ${_viewModel.isNotSinglePdfLoaded()}");
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -398,6 +400,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         spacing: 10,
         children: [
           const SizedBox(),
+
           _viewModel.isNotSinglePdfLoaded()
               ? ElevatedButton(
                 onPressed: _createPdfFromMix,
@@ -426,6 +429,8 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     setState(() {
       _pickingFiles = true;
     });
+    print("subiendo archivos con result: $result");
+
     await _viewModel.pickImages(result);
     setState(() {
       _pickingFiles = false;
@@ -459,6 +464,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   ///
   /// @return Void
   Future<void> _createPdfFromMix() async {
+    print("entro dentro del _createPdfFromMix");
     await _viewModel.createPDFFromDocuments(delegate);
   }
 
