@@ -469,6 +469,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   ///
   /// @return Void
   Future<void> _createImagesFromPDF() async {
+    print("entro dentro del _createImagesFromPDF");
     await _viewModel.createImagesFromPDF(delegate);
   }
 

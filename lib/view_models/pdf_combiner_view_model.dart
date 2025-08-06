@@ -150,8 +150,10 @@ class PdfCombinerViewModel {
 
   /// Create a PDF file from a list of images
   Future<void> createImagesFromPDF(PdfCombinerDelegate delegate) async {
+    print("entro dentro del createImagesFromPDF");
     final directory = await _getOutputDirectory();
     final outputFilePath = '${directory?.path}';
+    print("entro dentro del createImagesFromPDF con la siguiente info: directorio: ${await _getOutputDirectory()}, filePath: ${directory?.path}, outputFilePath: $outputFilePath, archivos seleccionados: ${selectedFiles.first}");
     await PdfCombiner.createImageFromPDF(
       inputPath: selectedFiles.first,
       outputDirPath: outputFilePath,
