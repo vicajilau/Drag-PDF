@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'core/l10n/app_localizations.dart';
 
 Future<void> main() async {
+  print("test la app se esta iniciando");
   runApp(const MyApp());
 }
 
