@@ -72,7 +72,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         });
       },
       onError: (error) {
-        printToConsole('hay un error en el proceso de combinado de archivos: $error');
+         printToConsole('hay un error en el proceso de combinado de archivos: $error');
         _showSnackbarSafely(error.toString());
       },
       onSuccess: (paths) {
