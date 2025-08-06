@@ -19,8 +19,6 @@ You should have received a copy of the GNU Lesser General
 Public License along with Drag-PDF. If not, see
 <https://www.gnu.org/licenses/>.
 */
-import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
-
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
 import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
@@ -74,7 +72,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
       },
       onError: (error) {
         if(kIsWeb) {
-          printToConsole(
+          print(
               'hay un error en el proceso de combinado de archivos: $error');
         }
         _showSnackbarSafely(error.toString());
@@ -82,7 +80,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
       onSuccess: (paths) {
         setState(() {
           if(kIsWeb) {
-            printToConsole(
+            print(
                 'El proceso de combinado fue exitoso con estas paths: $paths');
           }
           _viewModel.outputFiles = paths;
