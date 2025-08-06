@@ -26,11 +26,10 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
 
+
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Enable web
-        run: flutter config --enable-web
 
       - name: Build web
         run: flutter build web --release --base-href /${{ github.event.repository.name }}/
