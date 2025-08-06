@@ -2,8 +2,8 @@ name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
+    branches:
+      - feature/test_github_pages_logs_console2
 
 permissions:
   contents: read
@@ -28,6 +28,9 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Enable web
+        run: flutter config --enable-web
 
       - name: Build web
         run: flutter build web --release --base-href /${{ github.event.repository.name }}/
