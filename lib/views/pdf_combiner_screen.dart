@@ -28,6 +28,7 @@ import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
 import 'package:drag_pdf/views/widgets/file_type_icon.dart';
 import 'package:file_magic_number/file_magic_number.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
@@ -72,12 +73,18 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         });
       },
       onError: (error) {
-         printToConsole('hay un error en el proceso de combinado de archivos: $error');
+        if(kIsWeb) {
+          printToConsole(
+              'hay un error en el proceso de combinado de archivos: $error');
+        }
         _showSnackbarSafely(error.toString());
       },
       onSuccess: (paths) {
         setState(() {
-          printToConsole('El proceso de combinado fue exitoso con estas paths: $paths');
+          if(kIsWeb) {
+            printToConsole(
+                'El proceso de combinado fue exitoso con estas paths: $paths');
+          }
           _viewModel.outputFiles = paths;
         });
         String message = AppLocalizations.of(
