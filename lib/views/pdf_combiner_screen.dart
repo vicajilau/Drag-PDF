@@ -306,7 +306,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     } else {
       print("entro en el floatButton, preparando archivos con pick files a  $_pickingFiles");
       return FloatingActionButton(
-        onPressed: () => _pickingFiles ? null : _pickFiles(),
+        onPressed: () async => _pickingFiles ? null : await _pickFiles(),
         tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
         child: const Icon(Icons.add),
       );
