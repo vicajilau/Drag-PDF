@@ -173,10 +173,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: ef7d2a085c1b1d69d17b6842d0734aad90156de08df6bd3c12496d0bd6ddf8e2
+      sha256: e7e16c9d15c36330b94ca0e2ad8cb61f93cd5282d0158c09805aed13b5452f22
       url: "https://pub.dev"
     source: hosted
-    version: "10.3.1"
+    version: "10.3.2"
   file_selector_linux:
     dependency: transitive
     description:
@@ -537,10 +537,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_combiner
-      sha256: "69777b74f784f327b1653454c72ec2d800156044c353c678c4e56f8e1d7eb36c"
+      sha256: "27f3e9e08bd5a4ae5e265bfae12b97af265356b1a49186e44ee53b011f970119"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.7"
+    version: "4.3.8"
   permission_handler:
     dependency: "direct main"
     description:
