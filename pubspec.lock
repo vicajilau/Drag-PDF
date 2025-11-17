@@ -173,10 +173,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: ef7d2a085c1b1d69d17b6842d0734aad90156de08df6bd3c12496d0bd6ddf8e2
+      sha256: f8f4ea435f791ab1f817b4e338ed958cb3d04ba43d6736ffc39958d950754967
       url: "https://pub.dev"
     source: hosted
-    version: "10.3.1"
+    version: "10.3.6"
   file_selector_linux:
     dependency: transitive
     description:
@@ -401,10 +401,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
+      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.0"
+    version: "1.17.0"
   mime:
     dependency: transitive
     description:
@@ -537,10 +537,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_combiner
-      sha256: "69777b74f784f327b1653454c72ec2d800156044c353c678c4e56f8e1d7eb36c"
+      sha256: fe2bdd2aef6d801cbc6ce60ada78342099c75a63dfa368f73dba3aa81ce46f97
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.7"
+    version: "4.4.0"
   permission_handler:
     dependency: "direct main"
     description:
@@ -678,10 +678,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "522f00f556e73044315fa4585ec3270f1808a4b186c936e612cab0b565ff1e00"
+      sha256: ab2726c1a94d3176a45960b6234466ec367179b87dd74f1611adb1f3b5fb9d55
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.6"
+    version: "0.7.7"
   typed_data:
     dependency: transitive
     description:
