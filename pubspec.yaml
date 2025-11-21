@@ -48,7 +48,7 @@ dependencies:
   pdf_combiner: ^4.3.8
   image_picker: ^1.2.0
   cunning_document_scanner: ^1.2.3
-  lottie: ^3.3.1
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:

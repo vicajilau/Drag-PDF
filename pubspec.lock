@@ -377,10 +377,10 @@ packages:
     dependency: "direct main"
     description:
       name: lottie
-      sha256: c5fa04a80a620066c15cf19cc44773e19e9b38e989ff23ea32e5903ef1015950
+      sha256: "8ae0be46dbd9e19641791dc12ee480d34e1fd3f84c749adc05f3ad9342b71b95"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.1"
+    version: "3.3.2"
   matcher:
     dependency: transitive
     description:
@@ -537,10 +537,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_combiner
-      sha256: "69777b74f784f327b1653454c72ec2d800156044c353c678c4e56f8e1d7eb36c"
+      sha256: "27f3e9e08bd5a4ae5e265bfae12b97af265356b1a49186e44ee53b011f970119"
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.7"
+    version: "4.3.8"
   permission_handler:
     dependency: "direct main"
     description:
