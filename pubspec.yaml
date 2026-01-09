@@ -47,7 +47,7 @@ dependencies:
   platform_detail: ^5.1.0
   pdf_combiner: ^4.4.0
   image_picker: ^1.2.1
-  cunning_document_scanner: ^1.2.3
+  cunning_document_scanner: ^1.4.0
   lottie: ^3.3.2
 
 dev_dependencies:
