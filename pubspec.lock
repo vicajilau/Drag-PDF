@@ -165,10 +165,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_magic_number
-      sha256: d44aa6231bc2a1b1780d85341c73226efd4ca7b2ccbc1b6057e7be1e39936055
+      sha256: "9f831e5f1d574cd07451049a2e8d3d0af9c65fb24a16d202a65862c48d455750"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "1.4.1"
   file_picker:
     dependency: "direct main"
     description:
@@ -537,10 +537,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_combiner
-      sha256: fe2bdd2aef6d801cbc6ce60ada78342099c75a63dfa368f73dba3aa81ce46f97
+      sha256: "4fc4227efa26aa8f9706aa14d2c283c8d4e52ebba7eae774ad304b232c364b4d"
       url: "https://pub.dev"
     source: hosted
-    version: "4.4.0"
+    version: "4.4.1"
   permission_handler:
     dependency: "direct main"
     description:
