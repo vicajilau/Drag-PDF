@@ -45,7 +45,7 @@ dependencies:
   get: ^4.7.3
   open_file: ^3.5.10
   platform_detail: ^5.1.0
-  pdf_combiner: ^4.4.1
+  pdf_combiner: ^4.4.2
   image_picker: ^1.2.1
   cunning_document_scanner: ^1.4.0
   lottie: ^3.3.2
