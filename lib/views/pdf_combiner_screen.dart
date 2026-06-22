@@ -78,53 +78,58 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
-      onTap: _handleTapOutside,
-      behavior: HitTestBehavior.translucent,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context).titleAppBar),
-          actions: [
-            IconButton(
-              onPressed:
-                  _viewModel.selectedFiles.isEmpty || _pickingFiles
-                      ? null
-                      : _restart,
-              icon: const Icon(Icons.restart_alt),
-              tooltip: AppLocalizations.of(context).restart_app_tooltip,
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, child) {
+        return GestureDetector(
+          onTap: _handleTapOutside,
+          behavior: HitTestBehavior.translucent,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(AppLocalizations.of(context).titleAppBar),
+              actions: [
+                IconButton(
+                  onPressed:
+                      _viewModel.selectedFiles.isEmpty || _pickingFiles
+                          ? null
+                          : _restart,
+                  icon: const Icon(Icons.restart_alt),
+                  tooltip: AppLocalizations.of(context).restart_app_tooltip,
+                ),
+              ],
             ),
-          ],
-        ),
-        body: SafeArea(
-          child:
-              isLoading()
-                  ? const LoadingScreen()
-                  : DropTarget(
-                    onDragEntered:
-                        (details) => setState(() => _isDragging = true),
-                    onDragExited:
-                        (details) => setState(() => _isDragging = false),
-                    onDragDone: (details) {
-                      setState(() {
-                        _isDragging = false;
-                        _viewModel.addFilesDragAndDrop(details.files);
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      color:
-                          _isDragging
-                              ? theme.primaryColor.withValues(alpha: 0.04)
-                              : Colors.transparent,
-                      child:
-                          (_viewModel.isEmpty())
-                              ? _buildEmptyState()
-                              : _buildMainContent(),
-                    ),
-                  ),
-        ),
-        floatingActionButton: getFloatButton(),
-      ),
+            body: SafeArea(
+              child:
+                  isLoading()
+                      ? const LoadingScreen()
+                      : DropTarget(
+                        onDragEntered:
+                            (details) => setState(() => _isDragging = true),
+                        onDragExited:
+                            (details) => setState(() => _isDragging = false),
+                        onDragDone: (details) {
+                          setState(() {
+                            _isDragging = false;
+                          });
+                          _viewModel.addFilesDragAndDrop(details.files);
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          color:
+                              _isDragging
+                                  ? theme.primaryColor.withValues(alpha: 0.04)
+                                  : Colors.transparent,
+                          child:
+                              (_viewModel.isEmpty())
+                                  ? _buildEmptyState()
+                                  : _buildMainContent(),
+                        ),
+                      ),
+            ),
+            floatingActionButton: getFloatButton(),
+          ),
+        );
+      },
     );
   }
 
@@ -484,9 +489,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
             key: ValueKey(filePath),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) {
-              setState(() {
-                _viewModel.removeFileAt(index);
-              });
+              _viewModel.removeFileAt(index);
               _showSnackbarSafely(
                 AppLocalizations.of(context).file_removed_message(fileName),
               );
@@ -654,7 +657,6 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   Future<void> _prepareFiles({FilePickerResult? result}) async {
     await _viewModel.prepareFiles(result);
-    setState(() {});
   }
 
   void _restart() {
@@ -674,7 +676,6 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     try {
       final outputPath = await _viewModel.createPDFFromDocuments();
       setState(() {
-        _viewModel.outputFiles = [outputPath];
         _progress = 1.0;
       });
       if (mounted) {
@@ -698,7 +699,6 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     try {
       final outputPaths = await _viewModel.createImagesFromPDF();
       setState(() {
-        _viewModel.outputFiles = outputPaths;
         _progress = 1.0;
       });
       if (mounted) {
@@ -740,10 +740,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   }
 
   void _onReorderFiles(int oldIndex, int newIndex) {
-    setState(() {
-      final file = _viewModel.selectedFiles.removeAt(oldIndex);
-      _viewModel.selectedFiles.insert(newIndex, file);
-    });
+    _viewModel.reorderFiles(oldIndex, newIndex);
   }
 
   void _showSnackbarSafely(String message) {
