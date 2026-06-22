@@ -26,8 +26,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf_combiner/models/merge_input.dart';
 import 'package:pdf_combiner/pdf_combiner.dart';
-import 'package:pdf_combiner/pdf_combiner_delegate.dart';
 import 'package:platform_detail/platform_detail.dart';
 
 class PdfCombinerViewModel {
@@ -47,10 +47,7 @@ class PdfCombinerViewModel {
   ///
   /// - Returns: A [Future] that completes when image selection and processing are done.
   Future<void> pickImages(FilePickerResult? result) async {
-    result ??= await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: true, // Allow picking multiple files
-    );
+    result ??= await FilePicker.pickFiles(type: FileType.image);
     if (result != null && result.files.isNotEmpty) {
       for (var element in result.files) {
         debugPrint("${element.name}, ");
@@ -115,47 +112,43 @@ class PdfCombinerViewModel {
   }
 
   /// Combine selected PDF files into a single output file
-  Future<void> combinePdfs(PdfCombinerDelegate delegate) async {
+  Future<String> combinePdfs() async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
 
-    await PdfCombiner.mergeMultiplePDFs(
-      inputPaths: selectedFiles,
+    return await PdfCombiner.mergeMultiplePDFs(
+      inputs: selectedFiles.map((path) => MergeInput.path(path)).toList(),
       outputPath: outputFilePath,
-      delegate: delegate,
     ); // Combine the PDFs
   }
 
   /// Create a PDF file from a list of images
-  Future<void> createPDFFromImages(PdfCombinerDelegate delegate) async {
+  Future<String> createPDFFromImages() async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
-    await PdfCombiner.createPDFFromMultipleImages(
-      inputPaths: selectedFiles,
+    return await PdfCombiner.createPDFFromMultipleImages(
+      inputs: selectedFiles.map((path) => MergeInput.path(path)).toList(),
       outputPath: outputFilePath,
-      delegate: delegate,
     );
   }
 
   /// Create a PDF file from a list of documents
-  Future<void> createPDFFromDocuments(PdfCombinerDelegate delegate) async {
+  Future<String> createPDFFromDocuments() async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
-    await PdfCombiner.generatePDFFromDocuments(
-      inputPaths: selectedFiles,
+    return await PdfCombiner.generatePDFFromDocuments(
+      inputs: selectedFiles.map((path) => MergeInput.path(path)).toList(),
       outputPath: outputFilePath,
-      delegate: delegate,
     );
   }
 
   /// Create a PDF file from a list of images
-  Future<void> createImagesFromPDF(PdfCombinerDelegate delegate) async {
+  Future<List<String>> createImagesFromPDF() async {
     final directory = await _getOutputDirectory();
     final outputFilePath = '${directory?.path}';
-    await PdfCombiner.createImageFromPDF(
-      inputPath: selectedFiles.first,
+    return await PdfCombiner.createImageFromPDF(
+      input: MergeInput.path(selectedFiles.first),
       outputDirPath: outputFilePath,
-      delegate: delegate,
     );
   }
 

@@ -29,7 +29,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
-import 'package:pdf_combiner/pdf_combiner_delegate.dart';
+// Removed deprecated delegate import
 import 'package:platform_detail/platform_detail.dart';
 
 import '../core/l10n/app_localizations.dart';
@@ -48,45 +48,16 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   final PdfCombinerViewModel _viewModel = PdfCombinerViewModel();
   bool _pickingFiles = false;
   double _progress = 0.0;
-  late PdfCombinerDelegate delegate;
   final GlobalKey<ExpandableFabState> _fabKey = GlobalKey<ExpandableFabState>();
   final ScanDocument scanDocument = ScanDocument();
 
   @override
   void initState() {
     super.initState();
-    initDelegate();
   }
 
   void _handleTapOutside() {
     _fabKey.currentState?.close();
-  }
-
-  void initDelegate() {
-    delegate = PdfCombinerDelegate(
-      onProgress: (updatedValue) {
-        setState(() {
-          _progress = updatedValue;
-        });
-      },
-      onError: (error) {
-        _showSnackbarSafely(error.toString());
-      },
-      onSuccess: (paths) {
-        setState(() {
-          _viewModel.outputFiles = paths;
-        });
-        String message = AppLocalizations.of(
-          context,
-        )!.success_snackbar_single_file(paths.first);
-        if (paths.length > 1) {
-          message = AppLocalizations.of(
-            context,
-          )!.success_snackbar_multiple_files(paths.length);
-        }
-        _showSnackbarSafely(message);
-      },
-    );
   }
 
   bool isLoading() => _progress != 0.0 && _progress != 1.0;
@@ -265,10 +236,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
               onPressed:
                   () async => {
                     _fabKey.currentState?.close(),
-                    result = await FilePicker.platform.pickFiles(
-                      type: FileType.any,
-                      allowMultiple: true,
-                    ),
+                    result = await FilePicker.pickFiles(type: FileType.any),
                     _prepareFiles(result: result),
                   },
               icon: const Icon(Icons.insert_drive_file),
@@ -449,7 +417,27 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   ///
   /// @return Void
   Future<void> _createPdfFromMix() async {
-    await _viewModel.createPDFFromDocuments(delegate);
+    setState(() {
+      _progress = 0.5;
+    });
+    try {
+      final outputPath = await _viewModel.createPDFFromDocuments();
+      setState(() {
+        _viewModel.outputFiles = [outputPath];
+        _progress = 1.0;
+      });
+      if (mounted) {
+        final message = AppLocalizations.of(
+          context,
+        )!.success_snackbar_single_file(outputPath);
+        _showSnackbarSafely(message);
+      }
+    } catch (e) {
+      setState(() {
+        _progress = 0.0;
+      });
+      _showSnackbarSafely(e.toString());
+    }
   }
 
   /// Extracts images from a PDF and saves them as separate image files.
@@ -459,7 +447,32 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   ///
   /// @return Void
   Future<void> _createImagesFromPDF() async {
-    await _viewModel.createImagesFromPDF(delegate);
+    setState(() {
+      _progress = 0.5;
+    });
+    try {
+      final outputPaths = await _viewModel.createImagesFromPDF();
+      setState(() {
+        _viewModel.outputFiles = outputPaths;
+        _progress = 1.0;
+      });
+      if (mounted) {
+        String message = AppLocalizations.of(
+          context,
+        )!.success_snackbar_single_file(outputPaths.first);
+        if (outputPaths.length > 1) {
+          message = AppLocalizations.of(
+            context,
+          )!.success_snackbar_multiple_files(outputPaths.length);
+        }
+        _showSnackbarSafely(message);
+      }
+    } catch (e) {
+      setState(() {
+        _progress = 0.0;
+      });
+      _showSnackbarSafely(e.toString());
+    }
   }
 
   /// Copies the output data to the clipboard.
