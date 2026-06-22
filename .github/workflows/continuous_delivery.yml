@@ -9,10 +9,10 @@ jobs:
     name: Generate Android Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Download Android keystore
         id: android_keystore
-        uses: timheuer/base64-to-file@v1
+        uses: timheuer/base64-to-file@v2
         with:
           fileName: upload-keystore.jks
           encodedString: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -35,7 +35,7 @@ jobs:
       - name: Start Android Release Build
         run: flutter build appbundle
       - name: Upload Release Build to Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-release-artifacts
           path: build/app/outputs/bundle/release/app-release.aab
