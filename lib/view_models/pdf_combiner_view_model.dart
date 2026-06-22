@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2025 Victor Carreras
+Copyright 2022-2026 Victor Carreras
 
 This file is part of Drag-PDF.
 
@@ -30,9 +30,13 @@ import 'package:pdf_combiner/models/merge_input.dart';
 import 'package:pdf_combiner/pdf_combiner.dart';
 import 'package:platform_detail/platform_detail.dart';
 
-class PdfCombinerViewModel {
-  List<String> selectedFiles = []; // List to store selected PDF file paths
-  List<String> outputFiles = []; // Path for the combined output file
+class PdfCombinerViewModel extends ChangeNotifier {
+  final List<String> _selectedFiles =
+      []; // List to store selected PDF file paths
+  final List<String> _outputFiles = []; // Path for the combined output file
+
+  List<String> get selectedFiles => List.unmodifiable(_selectedFiles);
+  List<String> get outputFiles => List.unmodifiable(_outputFiles);
 
   /// Allows the user to pick multiple image files and processes them.
   ///
@@ -52,7 +56,7 @@ class PdfCombinerViewModel {
       for (var element in result.files) {
         debugPrint("${element.name}, ");
       }
-      prepareFiles(result);
+      await prepareFiles(result);
     }
   }
 
@@ -87,8 +91,9 @@ class PdfCombinerViewModel {
   ///
   /// @return Void
   Future<void> addFilesDragAndDrop(List<DropItem> files) async {
-    selectedFiles += files.map((file) => file.path).toList();
-    outputFiles = [];
+    _selectedFiles.addAll(files.map((file) => file.path));
+    _outputFiles.clear();
+    notifyListeners();
   }
 
   /// Checks if the collection is empty.
@@ -97,18 +102,20 @@ class PdfCombinerViewModel {
   /// It returns `true` if the collection is empty, and `false` otherwise.
   ///
   /// @return `true` if the collection is empty, `false` otherwise.
-  bool isEmpty() => selectedFiles.isEmpty;
+  bool isEmpty() => _selectedFiles.isEmpty;
 
   /// Pick PDF files from the device
-  Future<void> _addFiles(List<File> files) async {
-    selectedFiles += files.map((file) => file.path).toList();
-    outputFiles = [];
+  void _addFiles(List<File> files) {
+    _selectedFiles.addAll(files.map((file) => file.path));
+    _outputFiles.clear();
+    notifyListeners();
   }
 
   /// Restart the selected files
   void restart() {
-    selectedFiles = [];
-    outputFiles = [];
+    _selectedFiles.clear();
+    _outputFiles.clear();
+    notifyListeners();
   }
 
   /// Combine selected PDF files into a single output file
@@ -116,40 +123,60 @@ class PdfCombinerViewModel {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
 
-    return await PdfCombiner.mergeMultiplePDFs(
-      inputs: selectedFiles.map((path) => MergeInput.path(path)).toList(),
+    final result = await PdfCombiner.mergeMultiplePDFs(
+      inputs: _selectedFiles.map((path) => MergeInput.path(path)).toList(),
       outputPath: outputFilePath,
     ); // Combine the PDFs
+
+    _outputFiles.clear();
+    _outputFiles.add(result);
+    notifyListeners();
+    return result;
   }
 
   /// Create a PDF file from a list of images
   Future<String> createPDFFromImages() async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
-    return await PdfCombiner.createPDFFromMultipleImages(
-      inputs: selectedFiles.map((path) => MergeInput.path(path)).toList(),
+    final result = await PdfCombiner.createPDFFromMultipleImages(
+      inputs: _selectedFiles.map((path) => MergeInput.path(path)).toList(),
       outputPath: outputFilePath,
     );
+
+    _outputFiles.clear();
+    _outputFiles.add(result);
+    notifyListeners();
+    return result;
   }
 
   /// Create a PDF file from a list of documents
   Future<String> createPDFFromDocuments() async {
     final directory = await _getOutputDirectory();
     String outputFilePath = '${directory?.path}/combined_output.pdf';
-    return await PdfCombiner.generatePDFFromDocuments(
-      inputs: selectedFiles.map((path) => MergeInput.path(path)).toList(),
+    final result = await PdfCombiner.generatePDFFromDocuments(
+      inputs: _selectedFiles.map((path) => MergeInput.path(path)).toList(),
       outputPath: outputFilePath,
     );
+
+    _outputFiles.clear();
+    _outputFiles.add(result);
+    notifyListeners();
+    return result;
   }
 
   /// Create a PDF file from a list of images
   Future<List<String>> createImagesFromPDF() async {
     final directory = await _getOutputDirectory();
     final outputFilePath = '${directory?.path}';
-    return await PdfCombiner.createImageFromPDF(
-      input: MergeInput.path(selectedFiles.first),
+    final results = await PdfCombiner.createImageFromPDF(
+      input: MergeInput.path(_selectedFiles.first),
       outputDirPath: outputFilePath,
     );
+
+    _outputFiles.clear();
+    _outputFiles.addAll(results);
+    notifyListeners();
+    return results;
   }
 
   /// Get the appropriate directory for saving the output file
@@ -169,28 +196,36 @@ class PdfCombinerViewModel {
 
   /// Copy the output file path to the clipboard
   Future<void> copyOutputToClipboard(int index) async {
-    if (outputFiles.isNotEmpty) {
+    if (_outputFiles.isNotEmpty) {
       await Clipboard.setData(
-        ClipboardData(text: outputFiles[index]),
+        ClipboardData(text: _outputFiles[index]),
       ); // Copy output path to clipboard
     }
   }
 
   /// Copy the selected files' paths to the clipboard
   Future<void> copySelectedFilesToClipboard(int index) async {
-    if (selectedFiles.isNotEmpty) {
+    if (_selectedFiles.isNotEmpty) {
       await Clipboard.setData(
-        ClipboardData(text: selectedFiles[index]),
+        ClipboardData(text: _selectedFiles[index]),
       ); // Copy selected files to clipboard
     }
   }
 
   /// Removes the selected files
   void removeFileAt(int index) {
-    selectedFiles.removeAt(index);
+    _selectedFiles.removeAt(index);
+    notifyListeners();
+  }
+
+  /// Reorder the selected files list
+  void reorderFiles(int oldIndex, int newIndex) {
+    final file = _selectedFiles.removeAt(oldIndex);
+    _selectedFiles.insert(newIndex, file);
+    notifyListeners();
   }
 
   /// Detects if the selected files are not a single PDF file
   bool isNotSinglePdfLoaded() =>
-      selectedFiles.length != 1 || !selectedFiles.first.endsWith('.pdf');
+      _selectedFiles.length != 1 || !_selectedFiles.first.endsWith('.pdf');
 }
