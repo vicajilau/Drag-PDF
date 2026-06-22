@@ -19,12 +19,10 @@ You should have received a copy of the GNU Lesser General
 Public License along with Drag-PDF. If not, see
 <https://www.gnu.org/licenses/>.
 */
+import 'package:cross_file/cross_file.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:drag_pdf/core/extensions/uint8list_extension.dart';
 import 'package:drag_pdf/views/widgets/expandable/action_button.dart';
 import 'package:drag_pdf/views/widgets/expandable/expandable_fab.dart';
-import 'package:drag_pdf/views/widgets/file_type_icon.dart';
-import 'package:file_magic_number/file_magic_number.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
@@ -34,7 +32,9 @@ import 'package:platform_detail/platform_detail.dart';
 import '../core/l10n/app_localizations.dart';
 import '../document_utils/scan_document.dart';
 import '../view_models/pdf_combiner_view_model.dart';
+import 'components/desktop/desktop_layout.dart';
 import 'components/loading.dart';
+import 'components/mobile/mobile_layout.dart';
 
 class PdfCombinerScreen extends StatefulWidget {
   const PdfCombinerScreen({super.key});
@@ -62,21 +62,10 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   bool isLoading() => _progress != 0.0 && _progress != 1.0;
 
-  Color _getFileColor(String path) {
-    final ext = p.extension(path).toLowerCase();
-    if (ext == '.pdf') return const Color(0xFFEF4444); // Red for PDF
-    if (ext == '.png' || ext == '.jpg' || ext == '.jpeg') {
-      return const Color(0xFF0EA5E9); // Sky/Teal for Images
-    }
-    if (ext == '.doc' || ext == '.docx') {
-      return const Color(0xFF3B82F6); // Blue for Word Docs
-    }
-    return const Color(0xFF64748B); // Slate/Grey for others
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDesktop = MediaQuery.of(context).size.width > 800;
 
     return ListenableBuilder(
       listenable: _viewModel,
@@ -85,19 +74,23 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
           onTap: _handleTapOutside,
           behavior: HitTestBehavior.translucent,
           child: Scaffold(
-            appBar: AppBar(
-              title: Text(AppLocalizations.of(context).titleAppBar),
-              actions: [
-                IconButton(
-                  onPressed:
-                      _viewModel.selectedFiles.isEmpty || _pickingFiles
-                          ? null
-                          : _restart,
-                  icon: const Icon(Icons.restart_alt),
-                  tooltip: AppLocalizations.of(context).restart_app_tooltip,
-                ),
-              ],
-            ),
+            appBar:
+                !PlatformDetail.isMobile || isDesktop
+                    ? null
+                    : AppBar(
+                      title: Text(AppLocalizations.of(context).titleAppBar),
+                      actions: [
+                        IconButton(
+                          onPressed:
+                              _viewModel.selectedFiles.isEmpty || _pickingFiles
+                                  ? null
+                                  : _restart,
+                          icon: const Icon(Icons.restart_alt),
+                          tooltip:
+                              AppLocalizations.of(context).restart_app_tooltip,
+                        ),
+                      ],
+                    ),
             body: SafeArea(
               child:
                   isLoading()
@@ -120,304 +113,88 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                                   ? theme.primaryColor.withValues(alpha: 0.04)
                                   : Colors.transparent,
                           child:
-                              (_viewModel.isEmpty())
-                                  ? _buildEmptyState()
-                                  : _buildMainContent(),
+                              isDesktop
+                                  ? DesktopLayout(
+                                    viewModel: _viewModel,
+                                    isDragging: _isDragging,
+                                    pickingFiles: _pickingFiles,
+                                    onPickFiles: _pickAnyFiles,
+                                    onRestart: _restart,
+                                    onOpenInput: _openInputFile,
+                                    onRemoveInput: (index) {
+                                      final fileName = p.basename(
+                                        _viewModel.selectedFiles[index],
+                                      );
+                                      _viewModel.removeFileAt(index);
+                                      _showSnackbarSafely(
+                                        AppLocalizations.of(
+                                          context,
+                                        ).file_removed_message(fileName),
+                                      );
+                                    },
+                                    onReorder: _onReorderFiles,
+                                    onOpenOutput: _openOutputFile,
+                                    onCopyOutput: _copyOutputToClipboard,
+                                    onSaveOutput: _saveOutputFile,
+                                    onCreatePdf: _createPdfFromMix,
+                                    onCreateImages: _createImagesFromPDF,
+                                  )
+                                  : MobileLayout(
+                                    viewModel: _viewModel,
+                                    isDragging: _isDragging,
+                                    pickingFiles: _pickingFiles,
+                                    onPickGallery: _pickFiles,
+                                    onPickFiles: _pickAnyFiles,
+                                    onPickScanner: () {
+                                      scanDocument.scanDocumentCamera((
+                                        FilePickerResult? result,
+                                      ) {
+                                        if (result != null) {
+                                          _pickFiles(result: result);
+                                        } else {
+                                          _pickFiles();
+                                        }
+                                      });
+                                    },
+                                    onOpenInput: _openInputFile,
+                                    onRemoveInput: (index) {
+                                      final fileName = p.basename(
+                                        _viewModel.selectedFiles[index],
+                                      );
+                                      _viewModel.removeFileAt(index);
+                                      _showSnackbarSafely(
+                                        AppLocalizations.of(
+                                          context,
+                                        ).file_removed_message(fileName),
+                                      );
+                                    },
+                                    onReorder: _onReorderFiles,
+                                    onOpenOutput: _openOutputFile,
+                                    onCopyOutput: _copyOutputToClipboard,
+                                    onSaveOutput: _saveOutputFile,
+                                  ),
                         ),
                       ),
             ),
-            floatingActionButton: getFloatButton(),
+            bottomNavigationBar:
+                !isDesktop && _viewModel.selectedFiles.isNotEmpty
+                    ? getBottomBarOptions()
+                    : null,
+            floatingActionButton:
+                !PlatformDetail.isMobile || isDesktop || _viewModel.isEmpty()
+                    ? null
+                    : getFloatButton(),
           ),
         );
       },
     );
   }
 
-  Widget _buildEmptyState() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 380,
-            padding: const EdgeInsets.all(32.0),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF111827) : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color:
-                    _isDragging
-                        ? theme.primaryColor
-                        : (isDark
-                            ? const Color(0xFF1F2937)
-                            : const Color(0xFFE2E8F0)),
-                width: 2.0,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color:
-                      _isDragging
-                          ? theme.primaryColor.withValues(alpha: 0.15)
-                          : Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Dynamic drag icon
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: EdgeInsets.all(_isDragging ? 26 : 20),
-                  decoration: BoxDecoration(
-                    color:
-                        _isDragging
-                            ? theme.primaryColor.withValues(alpha: 0.1)
-                            : theme.primaryColor.withValues(alpha: 0.05),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    _isDragging
-                        ? Icons.downloading_rounded
-                        : Icons.drive_folder_upload_rounded,
-                    size: 56,
-                    color: theme.primaryColor,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  _isDragging
-                      ? "Drop files here!"
-                      : AppLocalizations.of(context).select_files_title_dialog,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  _isDragging
-                      ? "Release to load your documents and images."
-                      : "Drag and drop your PDFs, images, or documents here, or browse files on your device.",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _pickFiles(),
-                    icon: const Icon(Icons.search_rounded, size: 18),
-                    label: Text(
-                      AppLocalizations.of(context).select_from_device_button,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContent() {
-    final isDesktop = MediaQuery.of(context).size.width > 800;
-
-    if (isDesktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left Column (Inputs)
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    top: 20.0,
-                    bottom: 8.0,
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context).input_files_title,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ),
-                getInputFiles(),
-              ],
-            ),
-          ),
-          // Vertical divider
-          const VerticalDivider(width: 1),
-          // Right Column (Outputs & Actions)
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_viewModel.outputFiles.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 20.0,
-                      top: 20.0,
-                      bottom: 8.0,
-                    ),
-                    child: Text(
-                      AppLocalizations.of(context).output_files_title,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  ),
-                  getOutputhFiles(),
-                  const Divider(),
-                ] else ...[
-                  const Spacer(),
-                ],
-                getBottomBarOptions(),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ],
-      );
-    } else {
-      // Mobile Layout: Column
-      return Column(
-        children: [
-          const SizedBox(height: 8),
-          if (_viewModel.outputFiles.isNotEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  AppLocalizations.of(context).output_files_title,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ),
-            ),
-            getOutputhFiles(),
-            const Divider(),
-          ],
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                AppLocalizations.of(context).input_files_title,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
-          ),
-          getInputFiles(),
-          getBottomBarOptions(),
-          const SizedBox(height: 16),
-        ],
-      );
+  Widget? getFloatButton() {
+    if (_viewModel.outputFiles.isNotEmpty) {
+      return null;
     }
-  }
-
-  int calculateFlexInputFiles() =>
-      _viewModel.outputFiles.isEmpty ||
-              _viewModel.selectedFiles.length <= _viewModel.outputFiles.length
-          ? 1
-          : 2;
-
-  int calculateFlexOutputFiles() =>
-      _viewModel.outputFiles.length <= _viewModel.selectedFiles.length ? 1 : 2;
-
-  Widget getOutputhFiles() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Expanded(
-      flex: calculateFlexOutputFiles(),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const BouncingScrollPhysics(),
-        itemCount: _viewModel.outputFiles.length,
-        itemBuilder: (context, index) {
-          final filePath = _viewModel.outputFiles[index];
-          final fileName = p.basename(filePath);
-
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                width: 1.0,
-              ),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              leading: FileTypeIcon(filePath: filePath),
-              title: Text(
-                fileName,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-              onTap: () => _openOutputFile(index),
-              subtitle: FutureBuilder(
-                future: FileMagicNumber.getBytesFromPathOrBlob(filePath),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Text(
-                      AppLocalizations.of(context).loading_size_message,
-                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
-                    );
-                  } else if (snapshot.hasError) {
-                    return const Icon(
-                      Icons.error_outline,
-                      size: 14,
-                      color: Colors.red,
-                    );
-                  } else {
-                    return Text(
-                      snapshot.data?.size() ??
-                          AppLocalizations.of(context).unknown_size_message,
-                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
-                    );
-                  }
-                },
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.copy_all_rounded, color: theme.primaryColor),
-                tooltip:
-                    AppLocalizations.of(
-                      context,
-                    ).snackbar_copy_output_to_clipboard,
-                onPressed: () => _copyOutputToClipboard(index),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget getFloatButton() {
     if (PlatformDetail.isMobile) {
-      FilePickerResult? result;
       return ExpandableFab(
         key: _fabKey,
         distance: 100,
@@ -433,12 +210,10 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
           Tooltip(
             message: AppLocalizations.of(context).select_from_device_button,
             child: ActionButton(
-              onPressed:
-                  () async => {
-                    _fabKey.currentState?.close(),
-                    result = await FilePicker.pickFiles(type: FileType.any),
-                    _prepareFiles(result: result),
-                  },
+              onPressed: () {
+                _fabKey.currentState?.close();
+                _pickAnyFiles();
+              },
               icon: const Icon(Icons.insert_drive_file),
             ),
           ),
@@ -463,153 +238,11 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
       );
     } else {
       return FloatingActionButton(
-        onPressed: () => _pickingFiles ? null : _pickFiles(),
+        onPressed: () => _pickingFiles ? null : _pickAnyFiles(),
         tooltip: AppLocalizations.of(context).add_new_files_tooltip,
         child: const Icon(Icons.add),
       );
     }
-  }
-
-  Widget getInputFiles() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Expanded(
-      flex: calculateFlexInputFiles(),
-      child: ReorderableListView.builder(
-        itemCount: _viewModel.selectedFiles.length,
-        onReorderItem: _onReorderFiles,
-        physics: const BouncingScrollPhysics(),
-        itemBuilder: (context, index) {
-          final filePath = _viewModel.selectedFiles[index];
-          final fileName = p.basename(filePath);
-          final fileColor = _getFileColor(filePath);
-
-          return Dismissible(
-            key: ValueKey(filePath),
-            direction: DismissDirection.endToStart,
-            onDismissed: (direction) {
-              _viewModel.removeFileAt(index);
-              _showSnackbarSafely(
-                AppLocalizations.of(context).file_removed_message(fileName),
-              );
-            },
-            background: Container(
-              margin: const EdgeInsets.symmetric(
-                vertical: 6.0,
-                horizontal: 16.0,
-              ),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 24),
-              child: const Icon(
-                Icons.delete_sweep_rounded,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-            child: Container(
-              margin: const EdgeInsets.symmetric(
-                vertical: 6.0,
-                horizontal: 16.0,
-              ),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF111827) : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color:
-                      isDark
-                          ? const Color(0xFF1F2937)
-                          : const Color(0xFFE2E8F0),
-                  width: 1.0,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Row(
-                  children: [
-                    // Type-colored left border accent
-                    Container(width: 6, height: 72, color: fileColor),
-                    Expanded(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        leading: FileTypeIcon(filePath: filePath),
-                        title: Text(
-                          fileName,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: FutureBuilder(
-                          future: FileMagicNumber.getBytesFromPathOrBlob(
-                            filePath,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Text(
-                                AppLocalizations.of(
-                                  context,
-                                ).loading_size_message,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return const Icon(
-                                Icons.error_outline,
-                                size: 14,
-                                color: Colors.red,
-                              );
-                            } else {
-                              return Text(
-                                snapshot.data?.size() ??
-                                    AppLocalizations.of(
-                                      context,
-                                    ).unknown_size_message,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                        trailing: Icon(
-                          Icons.drag_indicator_rounded,
-                          color:
-                              isDark
-                                  ? const Color(0xFF4B5563)
-                                  : const Color(0xFF9CA3AF),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   Widget getBottomBarOptions() {
@@ -655,8 +288,41 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     });
   }
 
-  Future<void> _prepareFiles({FilePickerResult? result}) async {
-    await _viewModel.prepareFiles(result);
+  Future<void> _pickAnyFiles() async {
+    setState(() {
+      _pickingFiles = true;
+    });
+    final result = await FilePicker.pickFiles(type: FileType.any);
+    if (result != null) {
+      await _viewModel.prepareFiles(result);
+    }
+    setState(() {
+      _pickingFiles = false;
+    });
+  }
+
+  Future<void> _saveOutputFile(int index) async {
+    if (index < _viewModel.outputFiles.length) {
+      final filePath = _viewModel.outputFiles[index];
+      final fileName = p.basename(filePath);
+
+      try {
+        final file = XFile(filePath);
+        final bytes = await file.readAsBytes();
+
+        final outputPath = await FilePicker.saveFile(
+          fileName: fileName,
+          type: FileType.any,
+          bytes: bytes,
+        );
+
+        if (outputPath != null && mounted) {
+          _showSnackbarSafely(AppLocalizations.of(context).success_save_file);
+        }
+      } catch (e) {
+        _showSnackbarSafely(e.toString());
+      }
+    }
   }
 
   void _restart() {
@@ -731,6 +397,17 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   Future<void> _openOutputFile(int index) async {
     if (index < _viewModel.outputFiles.length) {
       final result = await OpenFile.open(_viewModel.outputFiles[index]);
+      if (mounted && result.type != ResultType.done) {
+        _showSnackbarSafely(
+          AppLocalizations.of(context).failed_open_file(result.message),
+        );
+      }
+    }
+  }
+
+  Future<void> _openInputFile(int index) async {
+    if (index < _viewModel.selectedFiles.length) {
+      final result = await OpenFile.open(_viewModel.selectedFiles[index]);
       if (mounted && result.type != ResultType.done) {
         _showSnackbarSafely(
           AppLocalizations.of(context).failed_open_file(result.message),

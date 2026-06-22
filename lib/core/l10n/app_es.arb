@@ -21,5 +21,7 @@
   "select_from_gallery_button": "Seleccionar desde la galeria",
   "cancel_button": "Cancelar",
   "select_file_type_title_dialog": "¿Qué tipo de fichero quieres cargar?",
-  "images_button": "Imágenes"
+  "images_button": "Imágenes",
+  "save_file_tooltip": "Guardar fichero",
+  "success_save_file": "¡Fichero guardado con éxito!"
 }

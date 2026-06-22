@@ -77,7 +77,7 @@ class PdfCombinerViewModel extends ChangeNotifier {
     final files =
         result?.files
             .where((file) => file.path != null)
-            .map((file) => File(file.path!))
+            .map((file) => file.path!)
             .toList();
     if (files != null) {
       _addFiles(files);
@@ -105,8 +105,8 @@ class PdfCombinerViewModel extends ChangeNotifier {
   bool isEmpty() => _selectedFiles.isEmpty;
 
   /// Pick PDF files from the device
-  void _addFiles(List<File> files) {
-    _selectedFiles.addAll(files.map((file) => file.path));
+  void _addFiles(List<String> files) {
+    _selectedFiles.addAll(files);
     _outputFiles.clear();
     notifyListeners();
   }

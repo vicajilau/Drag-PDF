@@ -13,7 +13,7 @@ void main() {
     // Verify that the AppBar is rendered.
     expect(find.byType(AppBar), findsOneWidget);
 
-    // Verify that the float/action button is rendered.
-    expect(find.byType(FloatingActionButton), findsOneWidget);
+    // Verify that the floatingActionButton is hidden initially (since list is empty).
+    expect(find.byType(FloatingActionButton), findsNothing);
   });
 }

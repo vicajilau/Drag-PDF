@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General
 Public License along with Drag-PDF. If not, see
 <https://www.gnu.org/licenses/>.
 */
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -45,7 +46,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Lottie.asset('assets/animations/loading.json')),
+      body: Center(
+        child:
+            kIsWeb
+                ? const SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 6,
+                    strokeCap: StrokeCap.round,
+                  ),
+                )
+                : Lottie.asset('assets/animations/loading.json'),
+      ),
     );
   }
 }

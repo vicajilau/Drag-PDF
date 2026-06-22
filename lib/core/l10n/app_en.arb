@@ -21,5 +21,7 @@
   "select_from_gallery_button": "Select from Gallery",
   "cancel_button": "Cancel",
   "select_file_type_title_dialog": "What type of file do you want to load?",
-  "images_button": "Images"
+  "images_button": "Images",
+  "save_file_tooltip": "Save file",
+  "success_save_file": "File saved successfully!"
 }

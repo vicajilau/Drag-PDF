@@ -87,4 +87,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get images_button => 'Images';
+
+  @override
+  String get save_file_tooltip => 'Save file';
+
+  @override
+  String get success_save_file => 'File saved successfully!';
 }

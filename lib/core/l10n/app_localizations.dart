@@ -235,6 +235,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Images'**
   String get images_button;
+
+  /// No description provided for @save_file_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Save file'**
+  String get save_file_tooltip;
+
+  /// No description provided for @success_save_file.
+  ///
+  /// In en, this message translates to:
+  /// **'File saved successfully!'**
+  String get success_save_file;
 }
 
 class _AppLocalizationsDelegate
