@@ -39,7 +39,7 @@ dependencies:
   desktop_drop: ^0.7.1
   file_magic_number: ^1.4.2
   file_picker: ^12.0.0-beta.7
-  path_provider: ^2.1.5
+  path_provider: ^2.1.6
   path: ^1.9.0
   permission_handler: ^12.0.1
   get: ^4.7.3
