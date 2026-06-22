@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2025 Victor Carreras
+Copyright 2022-2026 Victor Carreras
 
 This file is part of Drag-PDF.
 
@@ -29,7 +29,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
-// Removed deprecated delegate import
 import 'package:platform_detail/platform_detail.dart';
 
 import '../core/l10n/app_localizations.dart';
@@ -48,6 +47,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   final PdfCombinerViewModel _viewModel = PdfCombinerViewModel();
   bool _pickingFiles = false;
   double _progress = 0.0;
+  bool _isDragging = false;
   final GlobalKey<ExpandableFabState> _fabKey = GlobalKey<ExpandableFabState>();
   final ScanDocument scanDocument = ScanDocument();
 
@@ -62,14 +62,28 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
 
   bool isLoading() => _progress != 0.0 && _progress != 1.0;
 
+  Color _getFileColor(String path) {
+    final ext = p.extension(path).toLowerCase();
+    if (ext == '.pdf') return const Color(0xFFEF4444); // Red for PDF
+    if (ext == '.png' || ext == '.jpg' || ext == '.jpeg') {
+      return const Color(0xFF0EA5E9); // Sky/Teal for Images
+    }
+    if (ext == '.doc' || ext == '.docx') {
+      return const Color(0xFF3B82F6); // Blue for Word Docs
+    }
+    return const Color(0xFF64748B); // Slate/Grey for others
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: _handleTapOutside,
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.titleAppBar),
+          title: Text(AppLocalizations.of(context).titleAppBar),
           actions: [
             IconButton(
               onPressed:
@@ -77,7 +91,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
                       ? null
                       : _restart,
               icon: const Icon(Icons.restart_alt),
-              tooltip: AppLocalizations.of(context)!.restart_app_tooltip,
+              tooltip: AppLocalizations.of(context).restart_app_tooltip,
             ),
           ],
         ),
@@ -86,52 +100,27 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
               isLoading()
                   ? const LoadingScreen()
                   : DropTarget(
+                    onDragEntered:
+                        (details) => setState(() => _isDragging = true),
+                    onDragExited:
+                        (details) => setState(() => _isDragging = false),
                     onDragDone: (details) {
                       setState(() {
+                        _isDragging = false;
                         _viewModel.addFilesDragAndDrop(details.files);
                       });
                     },
-                    child:
-                        (_viewModel.isEmpty())
-                            ? Center(
-                              child: Image.asset('assets/files/home.png'),
-                            )
-                            : Column(
-                              spacing: 20,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                if (_viewModel.outputFiles.isNotEmpty) ...[
-                                  // HERE IS THE OUTPUT SECTION
-                                  const SizedBox(),
-                                  Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.output_files_title,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  getOutputhFiles(),
-                                  const Divider(),
-                                ],
-                                // HERE IS THE INPUT SECTION
-                                const SizedBox(),
-                                Text(
-                                  AppLocalizations.of(
-                                    context,
-                                  )!.input_files_title,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                getInputFiles(),
-                                // Buttons Section
-                                getBottomBarOptions(),
-                                const SizedBox(height: 20),
-                              ],
-                            ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      color:
+                          _isDragging
+                              ? theme.primaryColor.withValues(alpha: 0.04)
+                              : Colors.transparent,
+                      child:
+                          (_viewModel.isEmpty())
+                              ? _buildEmptyState()
+                              : _buildMainContent(),
+                    ),
                   ),
         ),
         floatingActionButton: getFloatButton(),
@@ -139,73 +128,279 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     );
   }
 
-  /// Calculates the flex size for the input files.
-  ///
-  /// This function determines the appropriate size or layout parameters for the input files
-  /// based on the available space, ensuring they are displayed correctly in a flexible layout.
-  ///
-  /// @return Integer value representing the flex size for the input files.
+  Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 380,
+            padding: const EdgeInsets.all(32.0),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF111827) : Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color:
+                    _isDragging
+                        ? theme.primaryColor
+                        : (isDark
+                            ? const Color(0xFF1F2937)
+                            : const Color(0xFFE2E8F0)),
+                width: 2.0,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      _isDragging
+                          ? theme.primaryColor.withValues(alpha: 0.15)
+                          : Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Dynamic drag icon
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.all(_isDragging ? 26 : 20),
+                  decoration: BoxDecoration(
+                    color:
+                        _isDragging
+                            ? theme.primaryColor.withValues(alpha: 0.1)
+                            : theme.primaryColor.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _isDragging
+                        ? Icons.downloading_rounded
+                        : Icons.drive_folder_upload_rounded,
+                    size: 56,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  _isDragging
+                      ? "Drop files here!"
+                      : AppLocalizations.of(context).select_files_title_dialog,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _isDragging
+                      ? "Release to load your documents and images."
+                      : "Drag and drop your PDFs, images, or documents here, or browse files on your device.",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _pickFiles(),
+                    icon: const Icon(Icons.search_rounded, size: 18),
+                    label: Text(
+                      AppLocalizations.of(context).select_from_device_button,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    final isDesktop = MediaQuery.of(context).size.width > 800;
+
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left Column (Inputs)
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    top: 20.0,
+                    bottom: 8.0,
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context).input_files_title,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ),
+                getInputFiles(),
+              ],
+            ),
+          ),
+          // Vertical divider
+          const VerticalDivider(width: 1),
+          // Right Column (Outputs & Actions)
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_viewModel.outputFiles.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 20.0,
+                      top: 20.0,
+                      bottom: 8.0,
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context).output_files_title,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+                  getOutputhFiles(),
+                  const Divider(),
+                ] else ...[
+                  const Spacer(),
+                ],
+                getBottomBarOptions(),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else {
+      // Mobile Layout: Column
+      return Column(
+        children: [
+          const SizedBox(height: 8),
+          if (_viewModel.outputFiles.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  AppLocalizations.of(context).output_files_title,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+            ),
+            getOutputhFiles(),
+            const Divider(),
+          ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                AppLocalizations.of(context).input_files_title,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+          ),
+          getInputFiles(),
+          getBottomBarOptions(),
+          const SizedBox(height: 16),
+        ],
+      );
+    }
+  }
+
   int calculateFlexInputFiles() =>
       _viewModel.outputFiles.isEmpty ||
               _viewModel.selectedFiles.length <= _viewModel.outputFiles.length
           ? 1
           : 2;
 
-  /// Calculates the flex size for the output files.
-  ///
-  /// This function determines the appropriate size or layout parameters for the output files
-  /// based on the available space, ensuring they are displayed correctly in a flexible layout.
-  ///
-  /// @return Integer value representing the flex size for the output files.
   int calculateFlexOutputFiles() =>
       _viewModel.outputFiles.length <= _viewModel.selectedFiles.length ? 1 : 2;
 
-  /// Generates the output file resulting from the combination of the input files.
-  ///
-  /// This function takes the selected input files, processes their content,
-  /// and creates a new file that merges or transforms them according to the application's logic.
-  ///
-  /// @return A widget with the combination of input files into one output file
   Widget getOutputhFiles() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Expanded(
       flex: calculateFlexOutputFiles(),
       child: ListView.builder(
         shrinkWrap: true,
-        physics: const AlwaysScrollableScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemCount: _viewModel.outputFiles.length,
         itemBuilder: (context, index) {
-          return Card(
-            shape: RoundedRectangleBorder(
+          final filePath = _viewModel.outputFiles[index];
+          final fileName = p.basename(filePath);
+
+          return Container(
+            margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color:
+                    isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                width: 1.0,
+              ),
             ),
             child: ListTile(
-              leading: FileTypeIcon(filePath: _viewModel.outputFiles[index]),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              leading: FileTypeIcon(filePath: filePath),
               title: Text(
-                p.basename(_viewModel.outputFiles[index]),
+                fileName,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
               onTap: () => _openOutputFile(index),
               subtitle: FutureBuilder(
-                future: FileMagicNumber.getBytesFromPathOrBlob(
-                  _viewModel.outputFiles[index],
-                ),
+                future: FileMagicNumber.getBytesFromPathOrBlob(filePath),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Text(
-                      AppLocalizations.of(context)!.loading_size_message,
+                      AppLocalizations.of(context).loading_size_message,
+                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
                     );
                   } else if (snapshot.hasError) {
-                    return const Icon(Icons.error);
+                    return const Icon(
+                      Icons.error_outline,
+                      size: 14,
+                      color: Colors.red,
+                    );
                   } else {
                     return Text(
                       snapshot.data?.size() ??
-                          AppLocalizations.of(context)!.unknown_size_message,
+                          AppLocalizations.of(context).unknown_size_message,
+                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
                     );
                   }
                 },
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.copy),
+                icon: Icon(Icons.copy_all_rounded, color: theme.primaryColor),
+                tooltip:
+                    AppLocalizations.of(
+                      context,
+                    ).snackbar_copy_output_to_clipboard,
                 onPressed: () => _copyOutputToClipboard(index),
               ),
             ),
@@ -223,7 +418,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
         distance: 100,
         children: [
           Tooltip(
-            message: AppLocalizations.of(context)!.select_from_gallery_button,
+            message: AppLocalizations.of(context).select_from_gallery_button,
             child: ActionButton(
               onPressed:
                   () async => {_fabKey.currentState?.close(), _pickFiles()},
@@ -231,7 +426,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
             ),
           ),
           Tooltip(
-            message: AppLocalizations.of(context)!.select_from_device_button,
+            message: AppLocalizations.of(context).select_from_device_button,
             child: ActionButton(
               onPressed:
                   () async => {
@@ -243,7 +438,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
             ),
           ),
           Tooltip(
-            message: AppLocalizations.of(context)!.select_from_scanner_button,
+            message: AppLocalizations.of(context).select_from_scanner_button,
             child: ActionButton(
               onPressed:
                   () async => {
@@ -264,74 +459,147 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     } else {
       return FloatingActionButton(
         onPressed: () => _pickingFiles ? null : _pickFiles(),
-        tooltip: AppLocalizations.of(context)!.add_new_files_tooltip,
+        tooltip: AppLocalizations.of(context).add_new_files_tooltip,
         child: const Icon(Icons.add),
       );
     }
   }
 
-  /// Prepares the files selected by the user using File Picker.
-  ///
-  /// This function processes the list of files obtained from the file picker,
-  /// validates their existence, and converts them into a suitable format for further use.
-  ///
-  /// @return A widget with a list of the selected files
   Widget getInputFiles() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Expanded(
       flex: calculateFlexInputFiles(),
       child: ReorderableListView.builder(
         itemCount: _viewModel.selectedFiles.length,
         onReorderItem: _onReorderFiles,
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
+          final filePath = _viewModel.selectedFiles[index];
+          final fileName = p.basename(filePath);
+          final fileColor = _getFileColor(filePath);
+
           return Dismissible(
-            key: ValueKey(_viewModel.selectedFiles[index]),
-            direction: DismissDirection.horizontal,
+            key: ValueKey(filePath),
+            direction: DismissDirection.endToStart,
             onDismissed: (direction) {
-              final path = p.basename(_viewModel.selectedFiles[index]);
               setState(() {
                 _viewModel.removeFileAt(index);
               });
               _showSnackbarSafely(
-                AppLocalizations.of(context)!.file_removed_message(path),
+                AppLocalizations.of(context).file_removed_message(fileName),
               );
             },
             background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(left: 16),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            child: Card(
-              shape: RoundedRectangleBorder(
+              margin: const EdgeInsets.symmetric(
+                vertical: 6.0,
+                horizontal: 16.0,
+              ),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: ListTile(
-                leading: FileTypeIcon(
-                  filePath: _viewModel.selectedFiles[index],
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 24),
+              child: const Icon(
+                Icons.delete_sweep_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            child: Container(
+              margin: const EdgeInsets.symmetric(
+                vertical: 6.0,
+                horizontal: 16.0,
+              ),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF111827) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color:
+                      isDark
+                          ? const Color(0xFF1F2937)
+                          : const Color(0xFFE2E8F0),
+                  width: 1.0,
                 ),
-                title: Text(
-                  p.basename(_viewModel.selectedFiles[index]),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                onTap: () async => await _openInputFile(index),
-                subtitle: FutureBuilder(
-                  future: FileMagicNumber.getBytesFromPathOrBlob(
-                    _viewModel.selectedFiles[index],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text(
-                        AppLocalizations.of(context)!.loading_size_message,
-                      );
-                    } else if (snapshot.hasError) {
-                      return const Icon(Icons.error);
-                    } else {
-                      return Text(
-                        snapshot.data?.size() ??
-                            AppLocalizations.of(context)!.unknown_size_message,
-                      );
-                    }
-                  },
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Row(
+                  children: [
+                    // Type-colored left border accent
+                    Container(width: 6, height: 72, color: fileColor),
+                    Expanded(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        leading: FileTypeIcon(filePath: filePath),
+                        title: Text(
+                          fileName,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: FutureBuilder(
+                          future: FileMagicNumber.getBytesFromPathOrBlob(
+                            filePath,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Text(
+                                AppLocalizations.of(
+                                  context,
+                                ).loading_size_message,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontSize: 12,
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return const Icon(
+                                Icons.error_outline,
+                                size: 14,
+                                color: Colors.red,
+                              );
+                            } else {
+                              return Text(
+                                snapshot.data?.size() ??
+                                    AppLocalizations.of(
+                                      context,
+                                    ).unknown_size_message,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontSize: 12,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        trailing: Icon(
+                          Icons.drag_indicator_rounded,
+                          color:
+                              isDark
+                                  ? const Color(0xFF4B5563)
+                                  : const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -341,45 +609,39 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     );
   }
 
-  /// Creates a bottom bar with buttons that perform actions on the input files.
-  ///
-  /// This function returns a widget representing a bottom bar,
-  /// where each button triggers a specific action related to the input files,
-  /// such as processing, validating, or modifying them.
-  ///
-  /// @return A `Widget` representing the bottom bar with action buttons for input files.
   Widget getBottomBarOptions() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        spacing: 10,
-        children: [
-          const SizedBox(),
-          _viewModel.isNotSinglePdfLoaded()
-              ? ElevatedButton(
-                onPressed: _createPdfFromMix,
-                child: Text(AppLocalizations.of(context)!.create_pdf_button),
-              )
-              : ElevatedButton(
-                onPressed: _createImagesFromPDF,
-                child: Text(
-                  AppLocalizations.of(context)!.create_images_from_pdf_button,
-                ),
-              ),
+    final isNotSinglePdf = _viewModel.isNotSinglePdfLoaded();
 
-          const SizedBox(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child:
+                isNotSinglePdf
+                    ? ElevatedButton.icon(
+                      onPressed: _createPdfFromMix,
+                      icon: const Icon(Icons.picture_as_pdf_rounded),
+                      label: Text(
+                        AppLocalizations.of(context).create_pdf_button,
+                      ),
+                    )
+                    : OutlinedButton.icon(
+                      onPressed: _createImagesFromPDF,
+                      icon: const Icon(Icons.image_outlined),
+                      label: Text(
+                        AppLocalizations.of(
+                          context,
+                        ).create_images_from_pdf_button,
+                      ),
+                    ),
+          ),
         ],
       ),
     );
   }
 
-  /// Allows the user to select a file or scan an image using the camera (on mobile devices).
-  ///
-  /// This function opens a file picker dialog with 2 options if the device is mobile,
-  /// provides the option to scan an image using the camera or another to pick a file.
-  ///
-  /// @return Void
   Future<void> _pickFiles({FilePickerResult? result}) async {
     setState(() {
       _pickingFiles = true;
@@ -395,27 +657,16 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     setState(() {});
   }
 
-  /// Resets the input and output files.
-  ///
-  /// This function clears any previously selected input files and output files,
-  /// returning the application to its initial state, ready for new file selection and processing.
-  ///
-  /// @return Void
   void _restart() {
     _viewModel.restart();
     setState(() {
       _progress = 0.0;
       _pickingFiles = false;
+      _isDragging = false;
     });
-    _showSnackbarSafely(AppLocalizations.of(context)!.snackbar_app_restart);
+    _showSnackbarSafely(AppLocalizations.of(context).snackbar_app_restart);
   }
 
-  /// Creates a PDF from a mixed set of input files.
-  ///
-  /// This function processes a combination of various input file types (e.g., text, images, or PDFs)
-  /// and generates a new PDF document containing the combined content.
-  ///
-  /// @return Void
   Future<void> _createPdfFromMix() async {
     setState(() {
       _progress = 0.5;
@@ -429,7 +680,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
       if (mounted) {
         final message = AppLocalizations.of(
           context,
-        )!.success_snackbar_single_file(outputPath);
+        ).success_snackbar_single_file(outputPath);
         _showSnackbarSafely(message);
       }
     } catch (e) {
@@ -440,12 +691,6 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     }
   }
 
-  /// Extracts images from a PDF and saves them as separate image files.
-  ///
-  /// This function processes a PDF file, extracts each page as an image,
-  /// and saves the images to the specified output location for further use.
-  ///
-  /// @return Void
   Future<void> _createImagesFromPDF() async {
     setState(() {
       _progress = 0.5;
@@ -459,11 +704,11 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
       if (mounted) {
         String message = AppLocalizations.of(
           context,
-        )!.success_snackbar_single_file(outputPaths.first);
+        ).success_snackbar_single_file(outputPaths.first);
         if (outputPaths.length > 1) {
           message = AppLocalizations.of(
             context,
-          )!.success_snackbar_multiple_files(outputPaths.length);
+          ).success_snackbar_multiple_files(outputPaths.length);
         }
         _showSnackbarSafely(message);
       }
@@ -475,60 +720,25 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     }
   }
 
-  /// Copies the output data to the clipboard.
-  ///
-  /// This function takes the generated output (e.g., file paths, text, or results)
-  /// and copies it to the clipboard, making it available for pasting into other applications.
-  ///
-  /// @return Void
   Future<void> _copyOutputToClipboard(int index) async {
     await _viewModel.copyOutputToClipboard(index);
     if (!mounted) return;
     _showSnackbarSafely(
-      AppLocalizations.of(context)!.snackbar_copy_output_to_clipboard,
+      AppLocalizations.of(context).snackbar_copy_output_to_clipboard,
     );
   }
 
-  /// Opens the output file for viewing or further processing.
-  ///
-  /// This function opens the generated output file (e.g., a PDF, image, or text file)
-  /// using the appropriate application on the device, allowing the user to view or interact with it.
-  ///
-  /// @return Void
   Future<void> _openOutputFile(int index) async {
     if (index < _viewModel.outputFiles.length) {
       final result = await OpenFile.open(_viewModel.outputFiles[index]);
       if (mounted && result.type != ResultType.done) {
         _showSnackbarSafely(
-          AppLocalizations.of(context)!.failed_open_file(result.message),
+          AppLocalizations.of(context).failed_open_file(result.message),
         );
       }
     }
   }
 
-  /// Opens the selected input file for viewing or editing.
-  ///
-  /// This function opens the specified input file (e.g., a document, image, or text file)
-  /// using the appropriate application on the device, allowing the user to view or make changes to it.
-  ///
-  /// @return Void
-  Future<void> _openInputFile(int index) async {
-    if (index < _viewModel.selectedFiles.length) {
-      final result = await OpenFile.open(_viewModel.selectedFiles[index]);
-      if (mounted && result.type != ResultType.done) {
-        _showSnackbarSafely(
-          AppLocalizations.of(context)!.failed_open_file(result.message),
-        );
-      }
-    }
-  }
-
-  /// Handles the reordering of files in the list.
-  ///
-  /// This function allows the user to reorder the selected files, updating their sequence
-  /// as per the new order. The file list is then refreshed to reflect the changes.
-  ///
-  /// @return Void
   void _onReorderFiles(int oldIndex, int newIndex) {
     setState(() {
       final file = _viewModel.selectedFiles.removeAt(oldIndex);
@@ -536,12 +746,6 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     });
   }
 
-  /// Displays a snackbar message safely on the screen.
-  ///
-  /// This function shows a snackbar with a given message, ensuring that it is displayed correctly
-  /// even if the app is in a transient state, such as during navigation or while other UI elements are active.
-  ///
-  /// @return Void
   void _showSnackbarSafely(String message) {
     if (mounted) {
       ScaffoldMessenger.of(

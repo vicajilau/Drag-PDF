@@ -1,5 +1,5 @@
 /*
-Copyright 2022-2025 Victor Carreras
+Copyright 2022-2026 Victor Carreras
 
 This file is part of Drag-PDF.
 
@@ -21,7 +21,7 @@ Public License along with Drag-PDF. If not, see
 */
 import 'package:file_magic_number/file_magic_number.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
+import 'package:path/path.dart' as p;
 
 class FileTypeIcon extends StatelessWidget {
   final String filePath;
@@ -29,15 +29,49 @@ class FileTypeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () => OpenFile.open(filePath),
+    final extension = p.extension(filePath).toLowerCase();
+
+    // Fast-path: Check file extension first to avoid unnecessary async delays for common types
+    if (extension == '.pdf') {
+      return SizedBox(
+        width: 40,
+        height: 40,
+        child: Image.asset("assets/files/pdf_file.png"),
+      );
+    } else if (extension == '.png') {
+      return SizedBox(
+        width: 40,
+        height: 40,
+        child: Image.asset("assets/files/png_file.png"),
+      );
+    } else if (extension == '.jpg' || extension == '.jpeg') {
+      return SizedBox(
+        width: 40,
+        height: 40,
+        child: Image.asset("assets/files/jpg_file.png"),
+      );
+    } else if (extension == '.doc' || extension == '.docx') {
+      return SizedBox(
+        width: 40,
+        height: 40,
+        child: Image.asset("assets/files/doc_file.png"),
+      );
+    }
+
+    // Fallback: If extension is not definitive, detect via Magic Number bytes
+    return SizedBox(
+      width: 40,
+      height: 40,
       child: FutureBuilder(
         future: FileMagicNumber.detectFileTypeFromPathOrBlob(filePath),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return Image.asset(
+              "assets/files/unknown_file.png",
+              opacity: const AlwaysStoppedAnimation(0.5),
+            );
           } else if (snapshot.hasError) {
-            return const Icon(Icons.error);
+            return const Icon(Icons.error_outline, color: Colors.red);
           } else {
             switch (snapshot.data) {
               case FileMagicNumberType.png:

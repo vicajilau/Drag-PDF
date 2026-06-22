@@ -1,34 +1,119 @@
-name: Flutter CI
+name: CI/CD
+
 on:
   push:
     branches:
       - main
-
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  flutter_ci:
-    name: Run flutter test and analyze
+  build-and-test:
+    name: Analyze, Format & Test
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Create .env file
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v6
+
+      - name: 🔑 Create env & properties files
         run: |
           echo '${{ secrets.FLUTTER_ENV_FILE }}' > .env
-      - name: Create key.properties file
-        run: |
           echo '${{ secrets.ANDROID_KEY_PROPERTIES_FILE }}' > android/key.properties
-      - name: Create local.properties file
-        run: |
           echo '${{ secrets.ANDROID_LOCAL_PROPERTIES_FILE }}' > android/local.properties
-      - uses: actions/setup-java@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '12'
-      - uses: subosito/flutter-action@v2
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
-      - run: flutter pub get
-      - run: flutter analyze
+          channel: 'stable'
+          cache: true
+
+      - name: 📥 Get Dependencies
+        run: flutter pub get
+
+      - name: 📝 Check Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: 🔍 Analyze Source Code
+        run: flutter analyze
+
+      - name: 🌐 Check for untranslated messages
+        run: |
+          # Check in both lib/l10n and lib/core/l10n as a fallback
+          L10N_FILE=""
+          if [ -f lib/core/l10n/untranslated_messages.json ]; then
+            L10N_FILE="lib/core/l10n/untranslated_messages.json"
+          elif [ -f lib/l10n/untranslated_messages.json ]; then
+            L10N_FILE="lib/l10n/untranslated_messages.json"
+          fi
+
+          if [ -n "$L10N_FILE" ]; then
+            content=$(cat "$L10N_FILE")
+            if [ "$content" = "{}" ]; then
+              echo "✅ All translations are complete!"
+            else
+              echo "❌ Found untranslated messages:"
+              cat "$L10N_FILE"
+              echo ""
+              echo "Please add the missing translations to the corresponding .arb files"
+              exit 1
+            fi
+          else
+            echo "ℹ️ No untranslated messages log found."
+          fi
+        shell: bash
+
+      - name: 🧪 Run Tests
+        run: flutter test
+
+  deploy-web:
+    name: Deploy Flutter Web to GitHub Pages
+    needs: build-and-test
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Create .env file
+        run: |
+          echo '${{ secrets.FLUTTER_ENV_FILE }}' > .env
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --wasm --base-href /${{ github.event.repository.name }}/
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: "./build/web"
+          include-hidden-files: true
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

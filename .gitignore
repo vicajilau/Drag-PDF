@@ -47,3 +47,7 @@ app.*.map.json
 
 # Secure INF
 *.env
+
+# Generated localization files we don't want to track
+lib/core/l10n/untranslated_messages.json
+
