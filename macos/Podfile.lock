@@ -1,21 +1,15 @@
 PODS:
   - FlutterMacOS (1.0.0)
-  - open_file_mac (0.0.1):
-    - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
-  - open_file_mac (from `Flutter/ephemeral/.symlinks/plugins/open_file_mac/macos`)
 
 EXTERNAL SOURCES:
   FlutterMacOS:
     :path: Flutter/ephemeral
-  open_file_mac:
-    :path: Flutter/ephemeral/.symlinks/plugins/open_file_mac/macos
 
 SPEC CHECKSUMS:
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  open_file_mac: 01874b6d6a2c1485ac9b126d7105b99102dea2cf
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
 
 PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 

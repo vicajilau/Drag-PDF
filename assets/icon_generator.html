@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drag PDF App Icon Generator - Multi-Format Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #05070f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #canvas {
+      width: 1024px;
+      height: 1024px;
+      position: relative;
+      background: linear-gradient(135deg, #090b16 0%, #111428 100%);
+      box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+    }
+
+    /* Ambient background glows for 3D depth */
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+    }
+
+    .glow-1 {
+      top: -100px;
+      left: -100px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(6, 182, 212, 0) 70%);
+    }
+
+    .glow-2 {
+      bottom: -150px;
+      right: -150px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0) 70%);
+    }
+
+    .glow-3 {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+    }
+
+    svg {
+      width: 1024px;
+      height: 1024px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="canvas">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <svg viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Shadow filters for realistic 3D depth -->
+        <filter id="shadow-main-card" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="15" dy="30" stdDeviation="25" flood-color="#000000" flood-opacity="0.65" />
+          <feDropShadow dx="5" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.35" />
+        </filter>
+
+        <filter id="shadow-mid-card" x="-35%" y="-35%" width="170%" height="170%">
+          <feDropShadow dx="8" dy="20" stdDeviation="20" flood-color="#000000" flood-opacity="0.55" />
+        </filter>
+
+        <filter id="shadow-back-card" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="2" dy="12" stdDeviation="15" flood-color="#000000" flood-opacity="0.5" />
+        </filter>
+
+        <filter id="shadow-cursor" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="8" dy="15" stdDeviation="10" flood-color="#000000" flood-opacity="0.5" />
+        </filter>
+        
+        <filter id="glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="8" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+
+        <!-- Color Gradients -->
+        <!-- Red/Orange (PDF) -->
+        <linearGradient id="pdfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FF2A54" />
+          <stop offset="100%" stop-color="#FF7A00" />
+        </linearGradient>
+
+        <!-- Teal/Cyan (Images) -->
+        <linearGradient id="imageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00F2FE" />
+          <stop offset="100%" stop-color="#4FACFE" />
+        </linearGradient>
+
+        <!-- Indigo/Purple (Documents) -->
+        <linearGradient id="docGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#F355FF" />
+          <stop offset="100%" stop-color="#6E0DF2" />
+        </linearGradient>
+
+        <!-- Drop Zone Glassmorphism -->
+        <linearGradient id="backZoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2D325A" stop-opacity="0.25" />
+          <stop offset="100%" stop-color="#14182E" stop-opacity="0.55" />
+        </linearGradient>
+
+        <!-- Fold highlight -->
+        <linearGradient id="foldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+          <stop offset="55%" stop-color="#FFB380" stop-opacity="0.8" />
+          <stop offset="100%" stop-color="#DF3519" stop-opacity="0.95" />
+        </linearGradient>
+
+        <linearGradient id="dragPathGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8" />
+          <stop offset="50%" stop-color="#6366F1" stop-opacity="0.6" />
+          <stop offset="100%" stop-color="#FF2A54" stop-opacity="0.9" />
+        </linearGradient>
+
+        <linearGradient id="cursorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FFFFFF" />
+          <stop offset="100%" stop-color="#E2E8F0" />
+        </linearGradient>
+      </defs>
+
+      <!-- 1. DROP TARGET RECEPTACLE (BACKGROUND) -->
+      <!-- Shows overlapping stencils representing that a file deck is dropped here -->
+      <g transform="translate(380, 560) rotate(-12)">
+        <!-- Backmost target outline -->
+        <rect x="-190" y="-250" width="360" height="480" rx="45" 
+              fill="url(#backZoneGrad)" 
+              stroke="rgba(255, 255, 255, 0.08)" 
+              stroke-width="3" 
+              filter="url(#shadow-back-card)" />
+        
+        <!-- Mid target outline -->
+        <rect x="-170" y="-230" width="340" height="460" rx="40" 
+              fill="none" 
+              stroke="rgba(255, 255, 255, 0.12)" 
+              stroke-width="3" 
+              stroke-dasharray="10 8" />
+
+        <!-- Front target outline -->
+        <rect x="-150" y="-210" width="300" height="420" rx="35" 
+              fill="none" 
+              stroke="rgba(255, 255, 255, 0.18)" 
+              stroke-width="3" 
+              stroke-dasharray="6 6" />
+
+        <!-- Drop target center indicator -->
+        <g stroke="rgba(255, 255, 255, 0.22)" stroke-width="6" stroke-linecap="round">
+          <line x1="-25" y1="0" x2="25" y2="0" />
+          <line x1="0" y1="-25" x2="0" y2="25" />
+        </g>
+      </g>
+
+      <!-- 2. MOTION DRAG TRAIL -->
+      <path d="M 380, 560 C 410, 360, 510, 360, 600, 480" 
+            fill="none" 
+            stroke="url(#dragPathGrad)" 
+            stroke-width="8" 
+            stroke-linecap="round" 
+            stroke-dasharray="16 14" />
+      
+      <circle cx="420" cy="460" r="6" fill="#06B6D4" filter="url(#glow-filter)" />
+      <circle cx="500" cy="380" r="8" fill="#6366F1" filter="url(#glow-filter)" />
+      <circle cx="565" cy="420" r="5" fill="#FF2A54" filter="url(#glow-filter)" />
+
+      <!-- 3. OVERLAPPING FILE DECK (FOREGROUND - BEING DRAGGED) -->
+      <!-- Translated to center group -->
+      <g transform="translate(620, 470)">
+        
+        <!-- ================= CARD 3: GENERAL DOCS (BACKMOST) ================= -->
+        <g transform="translate(-75, -55) rotate(-10)">
+          <!-- Card Base -->
+          <rect x="-180" y="-240" width="360" height="480" rx="35" 
+                fill="url(#docGrad)" 
+                stroke="rgba(255, 255, 255, 0.18)" 
+                stroke-width="2"
+                filter="url(#shadow-back-card)" />
+          
+          <!-- Document Content lines representing Text/Word/Excel -->
+          <g fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="12" stroke-linecap="round" transform="translate(0, 10)">
+            <line x1="-110" y1="-140" x2="110" y2="-140" stroke-width="14" stroke="rgba(255, 255, 255, 0.45)" />
+            <line x1="-110" y1="-80" x2="110" y2="-80" />
+            <line x1="-110" y1="-30" x2="50" y2="-30" />
+            <line x1="-110" y1="20" x2="110" y2="20" />
+            <line x1="-110" y1="70" x2="80" y2="70" />
+            <line x1="-110" y1="120" x2="110" y2="120" />
+            <line x1="-110" y1="170" x2="-20" y2="170" />
+          </g>
+        </g>
+
+        <!-- ================= CARD 2: IMAGES (MIDDLE) ================= -->
+        <g transform="translate(-25, -10) rotate(-2)">
+          <!-- Card Base -->
+          <rect x="-180" y="-240" width="360" height="480" rx="35" 
+                fill="url(#imageGrad)" 
+                stroke="rgba(255, 255, 255, 0.2)" 
+                stroke-width="2.5"
+                filter="url(#shadow-mid-card)" />
+          
+          <!-- Vector Landscape/Photo icon -->
+          <!-- Picture Frame border -->
+          <rect x="-110" y="-120" width="220" height="190" rx="20" 
+                fill="none" 
+                stroke="rgba(255, 255, 255, 0.4)" 
+                stroke-width="8" />
+          
+          <!-- Sun -->
+          <circle cx="45" cy="-55" r="22" 
+                  fill="none" 
+                  stroke="rgba(255, 255, 255, 0.4)" 
+                  stroke-width="6" />
+          
+          <!-- Mountains -->
+          <path d="M -85,35 L -30,-25 C -25,-30 -15,-30 -10,-25 L 30,35" 
+                fill="none" 
+                stroke="rgba(255, 255, 255, 0.4)" 
+                stroke-width="8" 
+                stroke-linecap="round" />
+          
+          <path d="M -35,35 L 15,-15 C 20,-20 28,-20 32,-15 L 75,35" 
+                fill="none" 
+                stroke="rgba(255, 255, 255, 0.4)" 
+                stroke-width="8" 
+                stroke-linecap="round" />
+
+          <!-- Bottom image captions/lines -->
+          <g fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="12" stroke-linecap="round" transform="translate(0, 10)">
+            <line x1="-110" y1="120" x2="110" y2="120" stroke-width="14" stroke="rgba(255, 255, 255, 0.45)" />
+            <line x1="-110" y1="170" x2="60" y2="170" />
+          </g>
+        </g>
+
+        <!-- ================= CARD 1: PDF (FRONT - THE MAIN ACTIVE FILE) ================= -->
+        <g transform="translate(40, 45) rotate(8)">
+          <!-- Card Shadow -->
+          <path d="M -180,-205 C -180,-226 -162,-245 -140,-245 L 90,-245 L 180,-155 L 180,205 C 180,226 162,245 140,245 L -140,245 C -162,245 -180,226 -180,205 Z" 
+                fill="#000000" fill-opacity="0.15" filter="url(#shadow-main-card)" />
+
+          <!-- Main Card Body (top right cut off for fold) -->
+          <path d="M -180,-205 C -180,-226 -162,-240 -140,-240 
+                   L 90,-240 
+                   L 180,-150 
+                   L 180,205 C 180,226 162,240 140,240 
+                   L -140,240 C -162,240 -180,226 -180,205 
+                   Z" 
+                fill="url(#pdfGrad)" 
+                filter="url(#shadow-main-card)" />
+
+          <!-- Inner Outline border highlight -->
+          <path d="M -178,-203 C -178,-223 -160,-238 -138,-238 
+                   L 89,-238 
+                   L 178,-149 
+                   L 178,203 C 178,223 160,238 138,238 
+                   L -138,238 C -160,238 -178,223 -178,203 
+                   Z" 
+                fill="none" 
+                stroke="rgba(255, 255, 255, 0.25)" 
+                stroke-width="3.5" />
+
+          <!-- Fold shadow & Folded Page corner -->
+          <path d="M 90,-240 L 90,-150 C 90,-138 102,-130 114,-130 L 180,-130 Z" 
+                fill="rgba(0,0,0,0.18)" />
+          <path d="M 90,-240 L 90,-150 C 90,-135 105,-130 120,-130 L 180,-130 L 90,-240 Z" 
+                fill="url(#foldGrad)" 
+                stroke="rgba(255, 255, 255, 0.35)" 
+                stroke-width="1.5" />
+
+          <!-- Top-center drag handle dots -->
+          <g fill="rgba(255, 255, 255, 0.45)" transform="translate(0, -195)">
+            <circle cx="-18" cy="0" r="4.5" />
+            <circle cx="0" cy="0" r="4.5" />
+            <circle cx="18" cy="0" r="4.5" />
+          </g>
+
+          <!-- Large bold "PDF" label -->
+          <text x="0" y="20" 
+                fill="#FFFFFF" 
+                font-family="'Outfit', sans-serif" 
+                font-weight="900" 
+                font-size="105px" 
+                letter-spacing="3px" 
+                text-anchor="middle"
+                style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));">PDF</text>
+
+          <!-- Bottom layout helper lines -->
+          <g fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="12" stroke-linecap="round" transform="translate(0, 10)">
+            <line x1="-105" y1="100" x2="105" y2="100" />
+            <line x1="-105" y1="145" x2="50" y2="145" stroke="rgba(255, 255, 255, 0.55)" stroke-width="14" />
+            <line x1="-105" y1="190" x2="105" y2="190" />
+          </g>
+
+          <!-- Floating/Grip ribbon on left edge -->
+          <rect x="-178" y="-100" width="8" height="120" rx="4" fill="rgba(255, 255, 255, 0.4)" />
+        </g>
+      </g>
+
+      <!-- 4. ELEGANT GLOWING CURSOR (THE DRAGGING MOUSE) -->
+      <!-- Positioned hovering at the edge of the PDF card to showcase interaction -->
+      <g transform="translate(735, 420) rotate(-12)" filter="url(#shadow-cursor)">
+        <!-- Cursor Glow -->
+        <path d="M 0,0 L 50,50 L 28,58 L 50,102 L 32,110 L 10,66 L -10,76 Z" 
+              fill="#06B6D4" opacity="0.3" filter="url(#glow-filter)" />
+        
+        <!-- Cursor Body -->
+        <path d="M 0,0 L 46,46 L 26,54 L 46,94 L 32,100 L 10,60 L -10,70 Z" 
+              fill="url(#cursorGrad)" 
+              stroke="#06B6D4" 
+              stroke-width="5" 
+              stroke-linejoin="round" />
+        
+        <circle cx="12" cy="24" r="4" fill="#06B6D4" />
+      </g>
+    </svg>
+  </div>
+
+</body>
+</html>
