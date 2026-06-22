@@ -161,6 +161,7 @@ class _InputFileCardState extends State<InputFileCard> {
                 child: Material(
                   color: Colors.transparent,
                   child: ListTile(
+                    onTap: widget.isDesktop ? null : widget.onOpen,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
