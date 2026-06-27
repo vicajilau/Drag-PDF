@@ -292,6 +292,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
   Future<void> _pickAnyFiles() async {
     setState(() {
       _pickingFiles = true;
+      _progress = 0.5;
     });
     final result = await FilePicker.pickFiles(type: FileType.any);
     if (result != null) {
@@ -299,6 +300,7 @@ class _PdfCombinerScreenState extends State<PdfCombinerScreen> {
     }
     setState(() {
       _pickingFiles = false;
+      _progress = 1.0;
     });
   }
 
